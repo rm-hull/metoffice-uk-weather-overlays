@@ -18,12 +18,14 @@ type DataHubClient interface {
 type DataHubManager struct {
 	baseUrl string
 	apiKey  string
+	client  *http.Client
 }
 
 func NewDataHubClient(apiKey string) DataHubClient {
 	return &DataHubManager{
 		baseUrl: "https://data.hub.api.metoffice.gov.uk/map-images/1.0.0",
 		apiKey:  apiKey,
+		client:  &http.Client{},
 	}
 }
 
@@ -37,8 +39,7 @@ func (mgr *DataHubManager) GetLatest(orderId string) (*metoffice.Response, error
 	req.Header.Set("apikey", mgr.apiKey)
 	req.Header.Set("Accept", "application/json")
 
-	client := &http.Client{}
-	res, err := client.Do(req)
+	res, err := mgr.client.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch from %s: %w", url, err)
 	}
@@ -71,8 +72,7 @@ func (mgr *DataHubManager) GetLatestDataFile(orderId, fileId string) (io.ReadClo
 	req.Header.Set("apikey", mgr.apiKey)
 	req.Header.Set("Accept", "image/png")
 
-	client := &http.Client{}
-	res, err := client.Do(req)
+	res, err := mgr.client.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch from %s: %w", url, err)
 	}
