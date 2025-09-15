@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"net/http"
 	"os"
 	"regexp"
 	"strconv"
@@ -153,8 +154,9 @@ func Router(rootDir string, port int) {
 
 	addr := fmt.Sprintf(":%d", port)
 	log.Printf("Starting HTTP API Server on port %d...", port)
-	err = r.Run(addr)
-	log.Fatalf("HTTP API Server failed to start on port %d: %v", port, err)
+	if err := r.Run(addr); err != nil && err != http.ErrServerClosed {
+		log.Fatalf("HTTP API Server failed to start on port %d: %v", port, err)
+	}
 }
 
 func main() {
