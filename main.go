@@ -1,25 +1,19 @@
 package main
 
 import (
-	"fmt"
-	"io"
 	"log"
-	"net/http"
 	"os"
-	"regexp"
-	"strconv"
 
-	"github.com/Depado/ginprom"
-	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
-	"github.com/rm-hull/metoffice-uk-weather-overlays/internal"
-	"github.com/rm-hull/metoffice-uk-weather-overlays/internal/png"
-	healthcheck "github.com/tavsec/gin-healthcheck"
-	"github.com/tavsec/gin-healthcheck/checks"
-	hc_config "github.com/tavsec/gin-healthcheck/config"
+	"github.com/rm-hull/metoffice-uk-weather-overlays/cmd"
+	"github.com/spf13/cobra"
 )
 
-func TestFetch() {
+func main() {
+	var err error
+	var rootPath string
+	var port int
+	var debug bool
 
 	if err := godotenv.Load(); err != nil {
 		log.Println("No .env file found")
@@ -30,135 +24,25 @@ func TestFetch() {
 		log.Fatal("Error: METOFFICE_DATAHUB_API_KEY environment variable not set.")
 	}
 
-	client := internal.NewDataHubClient(apiKey)
-	resp, err := client.GetLatest("o205748062845")
-	if err != nil {
-		panic(err)
+	rootCmd := &cobra.Command{
+		Use:  "uk-weather-overlays",
+		Long: `Met Office UK weather overlays`,
 	}
 
-	re := regexp.MustCompile(`(.*?)_ts(\d{1,2})_(\d{4})(\d{2})(\d{2})00`)
-
-	for _, file := range resp.OrderDetails.Files {
-		matches := re.FindStringSubmatch(file.FileId)
-		if matches == nil {
-			continue
-		}
-
-		path, err := createPath(matches)
-		if err != nil {
-			panic(err)
-		}
-
-		hour, err := strconv.Atoi(matches[2])
-		if err != nil {
-			panic(err)
-		}
-
-		kind := matches[1]
-		filename := fmt.Sprintf("%s/%02d.png", path, hour)
-
-		if _, err := os.Stat(filename); err == nil {
-			// File already exists, skip.
-			continue
-		} else if !os.IsNotExist(err) {
-			// An unexpected error occurred (e.g., permissions).
-			panic(err)
-		}
-
-		inFile, err := client.GetLatestDataFile(resp.OrderDetails.Order.OrderId, file.FileId)
-		if err != nil {
-			panic(err)
-		}
-
-		outFile, err := os.Create(filename)
-		if err != nil {
-			panic(err)
-		}
-
-		if kind == "total_precipitation_rate" {
-			err = png.Smooth(inFile, outFile, 50, 1.0)
-		} else {
-			_, err = io.Copy(outFile, inFile)
-		}
-		if err != nil {
-			panic(err)
-		}
-		if err := inFile.Close(); err != nil {
-			log.Printf("failed to close data file: %v", err)
-		}
-		if err := outFile.Close(); err != nil {
-			log.Printf("failed to close data file: %v", err)
-		}
-	}
-}
-
-func CreateAnimation() {
-
-	dirPath := "data/datahub/temperature_at_surface/2025/09/15/"
-	entries, err := os.ReadDir(dirPath)
-	if err != nil {
-		panic(err)
+	apiServerCmd := &cobra.Command{
+		Use:   "api-server [--root <path>] [--port <port>] [--debug]",
+		Short: "Start HTTP API server",
+		Run: func(_ *cobra.Command, _ []string) {
+			cmd.ApiServer(rootPath, port, debug)
+		},
 	}
 
-	files := make([]string, len(entries))
-	for i, entry := range entries {
-		fmt.Println(entry.Name()) // just the filename
-		files[i] = dirPath + entry.Name()
+	apiServerCmd.Flags().StringVar(&rootPath, "root", "./data/datahub", "Path to root folder")
+	apiServerCmd.Flags().IntVar(&port, "port", 8080, "Port to run HTTP server on")
+	apiServerCmd.Flags().BoolVar(&debug, "debug", false, "Enable debugging (pprof) - WARING: do not enable in production")
+
+	rootCmd.AddCommand(apiServerCmd)
+	if err = rootCmd.Execute(); err != nil {
+		log.Fatal(err)
 	}
-
-	apngBytes, err := png.Animate(files, 1.0)
-	if err != nil {
-		panic(err)
-	}
-
-	err = os.WriteFile("data/temp.png", apngBytes, 0644)
-	if err != nil {
-		panic(err)
-	}
-
-}
-
-func createPath(matches []string) (string, error) {
-	path := fmt.Sprintf("data/datahub/%s/%s/%s/%s", matches[1], // type
-		matches[3], // year
-		matches[4], // month
-		matches[5], // day
-	)
-	if err := os.MkdirAll(path, 0755); err != nil {
-		return "", err
-	}
-	return path, nil
-}
-
-func Router(rootDir string, port int) {
-	r := gin.New()
-
-	prometheus := ginprom.New(
-		ginprom.Engine(r),
-		ginprom.Path("/metrics"),
-		ginprom.Ignore("/healthz"),
-	)
-
-	r.Use(
-		gin.Recovery(),
-		gin.LoggerWithWriter(gin.DefaultWriter, "/healthz", "/metrics"),
-		prometheus.Instrument(),
-	)
-
-	err := healthcheck.New(r, hc_config.DefaultConfig(), []checks.Check{})
-	if err != nil {
-		log.Fatalf("failed to initialize healthcheck: %v", err)
-	}
-
-	r.Static("/v1/metoffice/datahub", rootDir)
-
-	addr := fmt.Sprintf(":%d", port)
-	log.Printf("Starting HTTP API Server on port %d...", port)
-	if err := r.Run(addr); err != nil && err != http.ErrServerClosed {
-		log.Fatalf("HTTP API Server failed to start on port %d: %v", port, err)
-	}
-}
-
-func main() {
-	Router("./data/datahub", 8080)
 }
