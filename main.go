@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"io"
 	"log"
-	"net/http"
 	"os"
 	"regexp"
 	"strconv"
@@ -13,6 +12,9 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/rm-hull/metoffice-uk-weather-overlays/internal"
 	"github.com/rm-hull/metoffice-uk-weather-overlays/internal/png"
+	healthcheck "github.com/tavsec/gin-healthcheck"
+	"github.com/tavsec/gin-healthcheck/checks"
+	hc_config "github.com/tavsec/gin-healthcheck/config"
 )
 
 func TestFetch() {
@@ -123,12 +125,17 @@ func createPath(matches []string) (string, error) {
 }
 
 func Router() {
-	r := gin.Default()
-	r.GET("/ping", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "pong",
-		})
-	})
+	r := gin.New()
+
+	r.Use(
+		gin.Recovery(),
+		gin.LoggerWithWriter(gin.DefaultWriter, "/healthz"),
+	)
+
+	err := healthcheck.New(r, hc_config.DefaultConfig(), []checks.Check{})
+	if err != nil {
+		log.Fatalf("failed to initialize healthcheck: %v", err)
+	}
 
 	r.Static("/v1/metoffice/datahub", "./data/datahub")
 
@@ -136,5 +143,5 @@ func Router() {
 }
 
 func main() {
-	TestFetch()
+	Router()
 }
