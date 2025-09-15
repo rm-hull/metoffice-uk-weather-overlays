@@ -2,7 +2,6 @@ package main
 
 import (
 	"log"
-	"os"
 
 	"github.com/joho/godotenv"
 	"github.com/rm-hull/metoffice-uk-weather-overlays/cmd"
@@ -17,11 +16,6 @@ func main() {
 
 	if err := godotenv.Load(); err != nil {
 		log.Println("No .env file found")
-	}
-
-	apiKey := os.Getenv("METOFFICE_DATAHUB_API_KEY")
-	if apiKey == "" {
-		log.Fatal("Error: METOFFICE_DATAHUB_API_KEY environment variable not set.")
 	}
 
 	rootCmd := &cobra.Command{
