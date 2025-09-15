@@ -35,7 +35,11 @@ func (mgr *DataHubManager) GetLatest(orderId string) (*metoffice.Response, error
 	if err != nil {
 		return nil, err
 	}
-	defer body.Close()
+	defer func() {
+		if err := body.Close(); err != nil {
+			log.Printf("failed to close body: %v", err)
+		}
+	}()
 
 	var resp metoffice.Response
 	decoder := json.NewDecoder(body)
@@ -66,7 +70,9 @@ func (mgr *DataHubManager) get(url string, acceptHeader string) (io.ReadCloser, 
 	}
 
 	if res.StatusCode > 299 {
-		res.Body.Close()
+		if err := res.Body.Close(); err != nil {
+			log.Printf("failed to close body: %v", err)
+		}
 		return nil, fmt.Errorf("http status response from %s: %s", url, res.Status)
 	}
 
