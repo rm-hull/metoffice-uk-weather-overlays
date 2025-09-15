@@ -78,6 +78,7 @@ func (mgr *DataHubManager) GetLatestDataFile(orderId, fileId string) (io.ReadClo
 	}
 
 	if res.StatusCode > 299 {
+		res.Body.Close()
 		return nil, fmt.Errorf("http status response from %s: %s", url, res.Status)
 	}
 
