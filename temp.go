@@ -27,7 +27,7 @@ func TestFetch() {
 	client := internal.NewDataHubClient(apiKey)
 	resp, err := client.GetLatest("o205748062845")
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	re := regexp.MustCompile(`(.*?)_ts(\d{1,2})_(\d{4})(\d{2})(\d{2})00`)
