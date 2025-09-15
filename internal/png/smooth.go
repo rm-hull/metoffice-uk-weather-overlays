@@ -1,4 +1,4 @@
-package internal
+package png
 
 import (
 	"image"
@@ -13,7 +13,7 @@ import (
 
 // adjust tolerance: higher means more aggressive removal
 // adjust sigma: tweak for more/less blur
-func SmoothPNG(r io.Reader, w io.Writer, tolerance float64, sigma float64) error {
+func Smooth(r io.Reader, w io.Writer, tolerance float64, sigma float64) error {
 
 	img, err := png.Decode(r)
 	if err != nil {

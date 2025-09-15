@@ -4,15 +4,18 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"net/http"
 	"os"
 	"regexp"
 	"strconv"
 
+	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"github.com/rm-hull/metoffice-uk-weather-overlays/internal"
+	"github.com/rm-hull/metoffice-uk-weather-overlays/internal/png"
 )
 
-func main() {
+func TestFetch() {
 
 	if err := godotenv.Load(); err != nil {
 		log.Println("No .env file found")
@@ -45,7 +48,7 @@ func main() {
 		}
 
 		kind := matches[1]
-		filename := fmt.Sprintf("%s/%02d.png", path, hour)
+		filename := fmt.Sprintf("datahub/%s/%02d.png", path, hour)
 
 		// Skip if the file exists
 		if _, err := os.Stat(filename); err == nil || !os.IsNotExist(err) {
@@ -56,23 +59,49 @@ func main() {
 		if err != nil {
 			panic(err)
 		}
-		defer data.Close()
 
 		outFile, err := os.Create(filename)
 		if err != nil {
 			panic(err)
 		}
-		defer outFile.Close()
 
 		if kind == "total_precipitation_rate" {
-			err = internal.SmoothPNG(data, outFile, 50, 1.0)
+			err = png.Smooth(data, outFile, 50, 1.0)
 		} else {
 			_, err = io.Copy(outFile, data)
 		}
 		if err != nil {
 			panic(err)
 		}
+		data.Close()
+		outFile.Close()
 	}
+}
+
+func CreateAnimation() {
+
+	dirPath := "data/datahub/temperature_at_surface/2025/09/15/"
+	entries, err := os.ReadDir(dirPath)
+	if err != nil {
+		panic(err)
+	}
+
+	files := make([]string, len(entries))
+	for i, entry := range entries {
+		fmt.Println(entry.Name()) // just the filename
+		files[i] = dirPath + entry.Name()
+	}
+
+	apngBytes, err := png.Animate(files, 1.0)
+	if err != nil {
+		panic(err)
+	}
+
+	err = os.WriteFile("data/temp.png", apngBytes, 0644)
+	if err != nil {
+		panic(err)
+	}
+
 }
 
 func createPath(matches []string) (string, error) {
@@ -85,4 +114,17 @@ func createPath(matches []string) (string, error) {
 		return "", err
 	}
 	return path, nil
+}
+
+func main() {
+	r := gin.Default()
+	r.GET("/ping", func(c *gin.Context) {
+		c.JSON(http.StatusOK, gin.H{
+			"message": "pong",
+		})
+	})
+
+	r.Static("/v1/metoffice/datahub", "./data/datahub")
+
+	_ = r.Run()
 }

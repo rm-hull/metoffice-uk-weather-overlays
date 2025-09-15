@@ -33,7 +33,5 @@ go.work.sum
 
 __debug_bin*
 
-data/cloud_amount_total
-data/mean_sea_level_pressure
-data/temperature_at_surface
-data/total_precipitation_rate
+data/datahub
+data/tmp
