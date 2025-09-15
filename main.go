@@ -36,7 +36,7 @@ func main() {
 	apiServerCmd.Flags().BoolVar(&debug, "debug", false, "Enable debugging (pprof) - WARING: do not enable in production")
 
 	rootCmd.AddCommand(apiServerCmd)
-	if err = rootCmd.Execute(); err != nil {
-		panic(err)
+	if err := rootCmd.Execute(); err != nil {
+		log.Fatal(err)
 	}
 }
