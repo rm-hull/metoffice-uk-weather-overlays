@@ -3,6 +3,11 @@ GET http://localhost:8080/healthz
 Accept: application/json
 
 
+### Prometheus
+GET http://localhost:8080/metrics
+Accept: text/plain
+
+
 ### Image data
 GET http://localhost:8080/v1/metoffice/datahub/total_precipitation_rate/2025/09/14/03.png
 Accept: image/png
