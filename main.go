@@ -53,9 +53,12 @@ func TestFetch() {
 		kind := matches[1]
 		filename := fmt.Sprintf("datahub/%s/%02d.png", path, hour)
 
-		// Skip if the file exists
-		if _, err := os.Stat(filename); err == nil || !os.IsNotExist(err) {
+		if _, err := os.Stat(filename); err == nil {
+			// File already exists, skip.
 			continue
+		} else if !os.IsNotExist(err) {
+			// An unexpected error occurred (e.g., permissions).
+			panic(err)
 		}
 
 		data, err := client.GetLatestDataFile(resp.OrderDetails.Order.OrderId, file.FileId)
