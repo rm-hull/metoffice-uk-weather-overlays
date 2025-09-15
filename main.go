@@ -43,6 +43,6 @@ func main() {
 
 	rootCmd.AddCommand(apiServerCmd)
 	if err = rootCmd.Execute(); err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 }

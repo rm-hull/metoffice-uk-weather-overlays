@@ -17,7 +17,7 @@ func TestFetch(apiKey string) {
 	client := internal.NewDataHubClient(apiKey)
 	resp, err := client.GetLatest("o205748062845")
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	re := regexp.MustCompile(`(.*?)_ts(\d{1,2})_(\d{4})(\d{2})(\d{2})00`)
@@ -30,12 +30,12 @@ func TestFetch(apiKey string) {
 
 		path, err := createPath(matches)
 		if err != nil {
-			panic(err)
+			log.Fatal(err)
 		}
 
 		hour, err := strconv.Atoi(matches[2])
 		if err != nil {
-			panic(err)
+			log.Fatal(err)
 		}
 
 		kind := matches[1]
@@ -46,17 +46,17 @@ func TestFetch(apiKey string) {
 			continue
 		} else if !os.IsNotExist(err) {
 			// An unexpected error occurred (e.g., permissions).
-			panic(err)
+			log.Fatal(err)
 		}
 
 		inFile, err := client.GetLatestDataFile(resp.OrderDetails.Order.OrderId, file.FileId)
 		if err != nil {
-			panic(err)
+			log.Fatal(err)
 		}
 
 		outFile, err := os.Create(filename)
 		if err != nil {
-			panic(err)
+			log.Fatal(err)
 		}
 
 		if kind == "total_precipitation_rate" {
@@ -65,7 +65,7 @@ func TestFetch(apiKey string) {
 			_, err = io.Copy(outFile, inFile)
 		}
 		if err != nil {
-			panic(err)
+			log.Fatal(err)
 		}
 		if err := inFile.Close(); err != nil {
 			log.Printf("failed to close data file: %v", err)
@@ -81,7 +81,7 @@ func CreateAnimation() {
 	dirPath := "data/datahub/temperature_at_surface/2025/09/15/"
 	entries, err := os.ReadDir(dirPath)
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	files := make([]string, len(entries))
@@ -92,14 +92,13 @@ func CreateAnimation() {
 
 	apngBytes, err := png.Animate(files, 1.0)
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
 
 	err = os.WriteFile("data/temp.png", apngBytes, 0644)
 	if err != nil {
-		panic(err)
+		log.Fatal(err)
 	}
-
 }
 
 func createPath(matches []string) (string, error) {
