@@ -11,6 +11,8 @@ import (
 	"github.com/rm-hull/metoffice-uk-weather-overlays/internal/png"
 )
 
+var fileIdRegex = regexp.MustCompile(`(.*?)_ts(\d{1,2})_(\d{4})(\d{2})(\d{2})00`)
+
 func NewScheduler(apiKey, orderId, rootDir string) (gocron.Scheduler, error) {
 
 	if err := testFetch(apiKey, orderId, rootDir); err != nil {
@@ -61,10 +63,8 @@ func testFetch(apiKey, orderId, rootDir string) error {
 		return path, nil
 	}
 
-	re := regexp.MustCompile(`(.*?)_ts(\d{1,2})_(\d{4})(\d{2})(\d{2})00`)
-
 	for _, file := range resp.OrderDetails.Files {
-		matches := re.FindStringSubmatch(file.FileId)
+		matches := fileIdRegex.FindStringSubmatch(file.FileId)
 		if matches == nil {
 			continue
 		}
@@ -95,24 +95,39 @@ func testFetch(apiKey, orderId, rootDir string) error {
 			return fmt.Errorf("failed to retrieve datafile %s for order %s: %w", file.FileId, orderId, err)
 		}
 
-		outFile, err := os.Create(filename)
+		tmpFile, err := os.CreateTemp(path, "download-*.tmp")
 		if err != nil {
-			return fmt.Errorf("failed to create file: %w", err)
+			_ = inFile.Close()
+			return fmt.Errorf("failed to create temporary file: %w", err)
 		}
 
+		var processingErr error
 		if kind == "total_precipitation_rate" {
-			err = png.Smooth(inFile, outFile, 50, 1.0)
+			processingErr = png.Smooth(inFile, tmpFile, 50, 1.0)
 		} else {
-			_, err = io.Copy(outFile, inFile)
+			_, processingErr = io.Copy(tmpFile, inFile)
 		}
-		if err != nil {
-			return err
+
+		// Always close files and check for errors
+		inFileCloseErr := inFile.Close()
+		tmpFileCloseErr := tmpFile.Close()
+
+		if processingErr != nil {
+			_ = os.Remove(tmpFile.Name())
+			return fmt.Errorf("failed to process data file: %w", processingErr)
 		}
-		if err := inFile.Close(); err != nil {
-			return fmt.Errorf("failed to close data file: %w", err)
+		if inFileCloseErr != nil {
+			_ = os.Remove(tmpFile.Name())
+			return fmt.Errorf("failed to close input file: %w", inFileCloseErr)
 		}
-		if err := outFile.Close(); err != nil {
-			return fmt.Errorf("failed to close data file: %w", err)
+		if tmpFileCloseErr != nil {
+			_ = os.Remove(tmpFile.Name())
+			return fmt.Errorf("failed to close temporary file: %w", tmpFileCloseErr)
+		}
+
+		if err := os.Rename(tmpFile.Name(), filename); err != nil {
+			_ = os.Remove(tmpFile.Name())
+			return fmt.Errorf("failed to rename temporary file: %w", err)
 		}
 	}
 
