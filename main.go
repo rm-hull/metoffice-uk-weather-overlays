@@ -8,6 +8,7 @@ import (
 	"regexp"
 	"strconv"
 
+	"github.com/Depado/ginprom"
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"github.com/rm-hull/metoffice-uk-weather-overlays/internal"
@@ -128,12 +129,19 @@ func createPath(matches []string) (string, error) {
 	return path, nil
 }
 
-func Router(rootDir string) {
+func Router(rootDir string, port int) {
 	r := gin.New()
+
+	prometheus := ginprom.New(
+		ginprom.Engine(r),
+		ginprom.Path("/metrics"),
+		ginprom.Ignore("/healthz"),
+	)
 
 	r.Use(
 		gin.Recovery(),
-		gin.LoggerWithWriter(gin.DefaultWriter, "/healthz"),
+		gin.LoggerWithWriter(gin.DefaultWriter, "/healthz", "/metrics"),
+		prometheus.Instrument(),
 	)
 
 	err := healthcheck.New(r, hc_config.DefaultConfig(), []checks.Check{})
@@ -143,9 +151,12 @@ func Router(rootDir string) {
 
 	r.Static("/v1/metoffice/datahub", rootDir)
 
-	_ = r.Run()
+	addr := fmt.Sprintf(":%d", port)
+	log.Printf("Starting HTTP API Server on port %d...", port)
+	err = r.Run(addr)
+	log.Fatalf("HTTP API Server failed to start on port %d: %v", port, err)
 }
 
 func main() {
-	Router("./data/datahub")
+	Router("./data/datahub", 8080)
 }
