@@ -1,0 +1,11 @@
+.github
+.vscode
+data/
+doc/
+LICENSE.md
+README.md
+ATTRIBUTION.md
+.env*
+docker-compose.yml
+generated/
+test-reports/

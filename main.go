@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"io"
 	"log"
-	"net/http"
 	"os"
 	"regexp"
 	"strconv"
@@ -13,6 +12,9 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/rm-hull/metoffice-uk-weather-overlays/internal"
 	"github.com/rm-hull/metoffice-uk-weather-overlays/internal/png"
+	healthcheck "github.com/tavsec/gin-healthcheck"
+	"github.com/tavsec/gin-healthcheck/checks"
+	hc_config "github.com/tavsec/gin-healthcheck/config"
 )
 
 func TestFetch() {
@@ -61,7 +63,7 @@ func TestFetch() {
 			panic(err)
 		}
 
-		data, err := client.GetLatestDataFile(resp.OrderDetails.Order.OrderId, file.FileId)
+		inFile, err := client.GetLatestDataFile(resp.OrderDetails.Order.OrderId, file.FileId)
 		if err != nil {
 			panic(err)
 		}
@@ -72,15 +74,19 @@ func TestFetch() {
 		}
 
 		if kind == "total_precipitation_rate" {
-			err = png.Smooth(data, outFile, 50, 1.0)
+			err = png.Smooth(inFile, outFile, 50, 1.0)
 		} else {
-			_, err = io.Copy(outFile, data)
+			_, err = io.Copy(outFile, inFile)
 		}
 		if err != nil {
 			panic(err)
 		}
-		data.Close()
-		outFile.Close()
+		if err := inFile.Close(); err != nil {
+			log.Printf("failed to close data file: %v", err)
+		}
+		if err := outFile.Close(); err != nil {
+			log.Printf("failed to close data file: %v", err)
+		}
 	}
 }
 
@@ -122,19 +128,24 @@ func createPath(matches []string) (string, error) {
 	return path, nil
 }
 
-func Router() {
-	r := gin.Default()
-	r.GET("/ping", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"message": "pong",
-		})
-	})
+func Router(rootDir string) {
+	r := gin.New()
 
-	r.Static("/v1/metoffice/datahub", "./data/datahub")
+	r.Use(
+		gin.Recovery(),
+		gin.LoggerWithWriter(gin.DefaultWriter, "/healthz"),
+	)
+
+	err := healthcheck.New(r, hc_config.DefaultConfig(), []checks.Check{})
+	if err != nil {
+		log.Fatalf("failed to initialize healthcheck: %v", err)
+	}
+
+	r.Static("/v1/metoffice/datahub", rootDir)
 
 	_ = r.Run()
 }
 
 func main() {
-	TestFetch()
+	Router("./data/datahub")
 }
