@@ -1,0 +1,1013 @@
+{
+  "orderDetails": {
+    "order": {
+      "orderId": "o205748062845",
+      "name": "O205748062845",
+      "modelId": "mo-uk-mimg",
+      "format": "PNG",
+      "productType": "MAP_IMAGES"
+    },
+    "files": [
+      {
+        "fileId": "cloud_amount_total_ts0_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "cloud_amount_total_ts0_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "cloud_amount_total_ts1_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "cloud_amount_total_ts1_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "cloud_amount_total_ts2_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "cloud_amount_total_ts2_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "cloud_amount_total_ts3_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "cloud_amount_total_ts3_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "cloud_amount_total_ts4_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "cloud_amount_total_ts4_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "cloud_amount_total_ts5_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "cloud_amount_total_ts5_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "cloud_amount_total_ts6_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "cloud_amount_total_ts6_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "cloud_amount_total_ts7_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "cloud_amount_total_ts7_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "cloud_amount_total_ts8_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "cloud_amount_total_ts8_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "cloud_amount_total_ts9_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "cloud_amount_total_ts9_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "cloud_amount_total_ts10_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "cloud_amount_total_ts10_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "cloud_amount_total_ts11_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "cloud_amount_total_ts11_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "cloud_amount_total_ts12_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "cloud_amount_total_ts12_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "cloud_amount_total_ts13_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "cloud_amount_total_ts13_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "cloud_amount_total_ts14_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "cloud_amount_total_ts14_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "cloud_amount_total_ts15_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "cloud_amount_total_ts15_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "cloud_amount_total_ts16_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "cloud_amount_total_ts16_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "cloud_amount_total_ts17_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "cloud_amount_total_ts17_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "cloud_amount_total_ts18_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "cloud_amount_total_ts18_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "cloud_amount_total_ts19_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "cloud_amount_total_ts19_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "cloud_amount_total_ts20_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "cloud_amount_total_ts20_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "cloud_amount_total_ts21_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "cloud_amount_total_ts21_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "cloud_amount_total_ts22_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "cloud_amount_total_ts22_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "cloud_amount_total_ts23_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "cloud_amount_total_ts23_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "cloud_amount_total_ts24_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "cloud_amount_total_ts24_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "mean_sea_level_pressure_ts0_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "mean_sea_level_pressure_ts0_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "mean_sea_level_pressure_ts1_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "mean_sea_level_pressure_ts1_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "mean_sea_level_pressure_ts2_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "mean_sea_level_pressure_ts2_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "mean_sea_level_pressure_ts3_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "mean_sea_level_pressure_ts3_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "mean_sea_level_pressure_ts4_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "mean_sea_level_pressure_ts4_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "mean_sea_level_pressure_ts5_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "mean_sea_level_pressure_ts5_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "mean_sea_level_pressure_ts6_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "mean_sea_level_pressure_ts6_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "mean_sea_level_pressure_ts7_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "mean_sea_level_pressure_ts7_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "mean_sea_level_pressure_ts8_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "mean_sea_level_pressure_ts8_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "mean_sea_level_pressure_ts9_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "mean_sea_level_pressure_ts9_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "mean_sea_level_pressure_ts10_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "mean_sea_level_pressure_ts10_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "mean_sea_level_pressure_ts11_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "mean_sea_level_pressure_ts11_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "mean_sea_level_pressure_ts12_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "mean_sea_level_pressure_ts12_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "mean_sea_level_pressure_ts13_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "mean_sea_level_pressure_ts13_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "mean_sea_level_pressure_ts14_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "mean_sea_level_pressure_ts14_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "mean_sea_level_pressure_ts15_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "mean_sea_level_pressure_ts15_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "mean_sea_level_pressure_ts16_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "mean_sea_level_pressure_ts16_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "mean_sea_level_pressure_ts17_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "mean_sea_level_pressure_ts17_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "mean_sea_level_pressure_ts18_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "mean_sea_level_pressure_ts18_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "mean_sea_level_pressure_ts19_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "mean_sea_level_pressure_ts19_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "mean_sea_level_pressure_ts20_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "mean_sea_level_pressure_ts20_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "mean_sea_level_pressure_ts21_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "mean_sea_level_pressure_ts21_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "mean_sea_level_pressure_ts22_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "mean_sea_level_pressure_ts22_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "mean_sea_level_pressure_ts23_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "mean_sea_level_pressure_ts23_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "mean_sea_level_pressure_ts24_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "mean_sea_level_pressure_ts24_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "total_precipitation_rate_ts0_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "total_precipitation_rate_ts0_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "total_precipitation_rate_ts1_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "total_precipitation_rate_ts1_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "total_precipitation_rate_ts2_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "total_precipitation_rate_ts2_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "total_precipitation_rate_ts3_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "total_precipitation_rate_ts3_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "total_precipitation_rate_ts4_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "total_precipitation_rate_ts4_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "total_precipitation_rate_ts5_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "total_precipitation_rate_ts5_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "total_precipitation_rate_ts6_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "total_precipitation_rate_ts6_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "total_precipitation_rate_ts7_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "total_precipitation_rate_ts7_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "total_precipitation_rate_ts8_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "total_precipitation_rate_ts8_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "total_precipitation_rate_ts9_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "total_precipitation_rate_ts9_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "total_precipitation_rate_ts10_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "total_precipitation_rate_ts10_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "total_precipitation_rate_ts11_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "total_precipitation_rate_ts11_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "total_precipitation_rate_ts12_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "total_precipitation_rate_ts12_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "total_precipitation_rate_ts13_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "total_precipitation_rate_ts13_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "total_precipitation_rate_ts14_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "total_precipitation_rate_ts14_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "total_precipitation_rate_ts15_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "total_precipitation_rate_ts15_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "total_precipitation_rate_ts16_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "total_precipitation_rate_ts16_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "total_precipitation_rate_ts17_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "total_precipitation_rate_ts17_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "total_precipitation_rate_ts18_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "total_precipitation_rate_ts18_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "total_precipitation_rate_ts19_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "total_precipitation_rate_ts19_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "total_precipitation_rate_ts20_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "total_precipitation_rate_ts20_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "total_precipitation_rate_ts21_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "total_precipitation_rate_ts21_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "total_precipitation_rate_ts22_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "total_precipitation_rate_ts22_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "total_precipitation_rate_ts23_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "total_precipitation_rate_ts23_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "total_precipitation_rate_ts24_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "total_precipitation_rate_ts24_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "temperature_at_surface_ts0_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "temperature_at_surface_ts0_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "temperature_at_surface_ts1_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "temperature_at_surface_ts1_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "temperature_at_surface_ts2_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "temperature_at_surface_ts2_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "temperature_at_surface_ts3_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "temperature_at_surface_ts3_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "temperature_at_surface_ts4_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "temperature_at_surface_ts4_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "temperature_at_surface_ts5_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "temperature_at_surface_ts5_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "temperature_at_surface_ts6_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "temperature_at_surface_ts6_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "temperature_at_surface_ts7_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "temperature_at_surface_ts7_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "temperature_at_surface_ts8_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "temperature_at_surface_ts8_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "temperature_at_surface_ts9_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "temperature_at_surface_ts9_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "temperature_at_surface_ts10_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "temperature_at_surface_ts10_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "temperature_at_surface_ts11_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "temperature_at_surface_ts11_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "temperature_at_surface_ts12_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "temperature_at_surface_ts12_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "temperature_at_surface_ts13_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "temperature_at_surface_ts13_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "temperature_at_surface_ts14_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "temperature_at_surface_ts14_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "temperature_at_surface_ts15_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "temperature_at_surface_ts15_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "temperature_at_surface_ts16_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "temperature_at_surface_ts16_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "temperature_at_surface_ts17_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "temperature_at_surface_ts17_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "temperature_at_surface_ts18_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "temperature_at_surface_ts18_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "temperature_at_surface_ts19_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "temperature_at_surface_ts19_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "temperature_at_surface_ts20_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "temperature_at_surface_ts20_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "temperature_at_surface_ts21_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "temperature_at_surface_ts21_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "temperature_at_surface_ts22_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "temperature_at_surface_ts22_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "temperature_at_surface_ts23_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "temperature_at_surface_ts23_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "temperature_at_surface_ts24_+00",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      },
+      {
+        "fileId": "temperature_at_surface_ts24_2025091400",
+        "runDateTime": "2025-09-14T00:00:00Z",
+        "run": "00"
+      }
+    ]
+  }
+}
