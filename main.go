@@ -51,7 +51,7 @@ func TestFetch() {
 		}
 
 		kind := matches[1]
-		filename := fmt.Sprintf("datahub/%s/%02d.png", path, hour)
+		filename := fmt.Sprintf("%s/%02d.png", path, hour)
 
 		if _, err := os.Stat(filename); err == nil {
 			// File already exists, skip.
@@ -111,7 +111,7 @@ func CreateAnimation() {
 }
 
 func createPath(matches []string) (string, error) {
-	path := fmt.Sprintf("data/%s/%s/%s/%s", matches[1], // type
+	path := fmt.Sprintf("data/datahub/%s/%s/%s/%s", matches[1], // type
 		matches[3], // year
 		matches[4], // month
 		matches[5], // day
@@ -122,7 +122,7 @@ func createPath(matches []string) (string, error) {
 	return path, nil
 }
 
-func main() {
+func Router() {
 	r := gin.Default()
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
@@ -133,4 +133,8 @@ func main() {
 	r.Static("/v1/metoffice/datahub", "./data/datahub")
 
 	_ = r.Run()
+}
+
+func main() {
+	TestFetch()
 }
