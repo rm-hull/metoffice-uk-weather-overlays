@@ -22,6 +22,9 @@ func TestFetch() {
 	}
 
 	apiKey := os.Getenv("METOFFICE_DATAHUB_API_KEY")
+	if apiKey == "" {
+		log.Fatal("Error: METOFFICE_DATAHUB_API_KEY environment variable not set.")
+	}
 
 	client := internal.NewDataHubClient(apiKey)
 	resp, err := client.GetLatest("o205748062845")
