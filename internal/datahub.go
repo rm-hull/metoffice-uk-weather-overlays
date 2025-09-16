@@ -11,7 +11,8 @@ import (
 )
 
 type DataHubClient interface {
-	GetLatest(orderId string) (*metoffice.Response, error)
+	GetAllOrders() (*metoffice.AllOrdersResponse, error)
+	GetLatest(orderId string) (*metoffice.LatestOrderResponse, error)
 	GetLatestDataFile(orderId, fileId string) (io.ReadCloser, error)
 }
 
@@ -29,7 +30,28 @@ func NewDataHubClient(apiKey string) DataHubClient {
 	}
 }
 
-func (mgr *DataHubManager) GetLatest(orderId string) (*metoffice.Response, error) {
+func (mgr *DataHubManager) GetAllOrders() (*metoffice.AllOrdersResponse, error) {
+	url := fmt.Sprintf("%s/orders", mgr.baseUrl)
+	body, err := mgr.get(url, "application/json")
+	if err != nil {
+		return nil, err
+	}
+	defer func() {
+		if err := body.Close(); err != nil {
+			log.Printf("failed to close body: %v", err)
+		}
+	}()
+
+	var resp metoffice.AllOrdersResponse
+	decoder := json.NewDecoder(body)
+	if err := decoder.Decode(&resp); err != nil {
+		return nil, fmt.Errorf("failed to unmarshal response: %w", err)
+	}
+
+	return &resp, nil
+}
+
+func (mgr *DataHubManager) GetLatest(orderId string) (*metoffice.LatestOrderResponse, error) {
 	url := fmt.Sprintf("%s/orders/%s/latest", mgr.baseUrl, orderId)
 	body, err := mgr.get(url, "application/json")
 	if err != nil {
@@ -41,7 +63,7 @@ func (mgr *DataHubManager) GetLatest(orderId string) (*metoffice.Response, error
 		}
 	}()
 
-	var resp metoffice.Response
+	var resp metoffice.LatestOrderResponse
 	decoder := json.NewDecoder(body)
 	if err := decoder.Decode(&resp); err != nil {
 		return nil, fmt.Errorf("failed to unmarshal response: %w", err)

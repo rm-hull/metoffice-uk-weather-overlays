@@ -3,6 +3,7 @@ package internal
 import (
 	"fmt"
 	"io"
+	"log"
 	"os"
 	"regexp"
 	"strconv"
@@ -45,7 +46,13 @@ func NewScheduler(apiKey, orderId, rootDir string) (gocron.Scheduler, error) {
 func testFetch(apiKey, orderId, rootDir string) error {
 
 	client := NewDataHubClient(apiKey)
-	resp, err := client.GetLatest(orderId)
+	orders, err := client.GetAllOrders()
+	if err != nil {
+		return fmt.Errorf("failed to retrieve order %s: %w", orderId, err)
+	}
+	log.Printf("orders: %v", orders)
+
+	latest, err := client.GetLatest(orderId)
 	if err != nil {
 		return fmt.Errorf("failed to retrieve order %s: %w", orderId, err)
 	}
@@ -63,7 +70,7 @@ func testFetch(apiKey, orderId, rootDir string) error {
 		return path, nil
 	}
 
-	for _, file := range resp.OrderDetails.Files {
+	for _, file := range latest.OrderDetails.Files {
 		matches := fileIdRegex.FindStringSubmatch(file.FileId)
 		if matches == nil {
 			continue
@@ -90,7 +97,7 @@ func testFetch(apiKey, orderId, rootDir string) error {
 			return err
 		}
 
-		inFile, err := client.GetLatestDataFile(resp.OrderDetails.Order.OrderId, file.FileId)
+		inFile, err := client.GetLatestDataFile(latest.OrderDetails.Order.OrderId, file.FileId)
 		if err != nil {
 			return fmt.Errorf("failed to retrieve datafile %s for order %s: %w", file.FileId, orderId, err)
 		}
