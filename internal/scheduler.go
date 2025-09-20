@@ -3,6 +3,7 @@ package internal
 import (
 	"fmt"
 	"io"
+	"log"
 	"os"
 	"regexp"
 	"strconv"
@@ -15,9 +16,11 @@ var fileIdRegex = regexp.MustCompile(`(.*?)_ts(\d{1,2})_(\d{4})(\d{2})(\d{2})00`
 
 func NewScheduler(apiKey, orderId, rootDir string) (gocron.Scheduler, error) {
 
-	if err := testFetch(apiKey, orderId, rootDir); err != nil {
-		return nil, fmt.Errorf("initial run of job failed: %w", err)
-	}
+	go func() {
+		if err := testFetch(apiKey, orderId, rootDir); err != nil {
+			log.Printf("initial run to fetch map images failed: %v", err)
+		}
+	}()
 
 	scheduler, err := gocron.NewScheduler()
 	if err != nil {
@@ -26,12 +29,14 @@ func NewScheduler(apiKey, orderId, rootDir string) (gocron.Scheduler, error) {
 
 	_, err = scheduler.NewJob(
 		gocron.DailyJob(1, gocron.NewAtTimes(
-			gocron.NewAtTime(2, 00, 00),
-			gocron.NewAtTime(3, 00, 00),
 			gocron.NewAtTime(4, 00, 00),
 			gocron.NewAtTime(5, 00, 00),
 		)),
-		gocron.NewTask(testFetch, apiKey, orderId, rootDir),
+		gocron.NewTask(func() {
+			if err := testFetch(apiKey, orderId, rootDir); err != nil {
+				log.Printf("failed to fetch map images: %v", err)
+			}
+		}),
 	)
 
 	if err != nil {
