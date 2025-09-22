@@ -1,50 +1,31 @@
-package internal
+package cmd
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"os"
 	"regexp"
 	"strconv"
 
-	"github.com/go-co-op/gocron/v2"
+	"github.com/rm-hull/metoffice-uk-weather-overlays/internal"
 	"github.com/rm-hull/metoffice-uk-weather-overlays/internal/png"
 )
 
-var fileIdRegex = regexp.MustCompile(`(.*?)_ts(\d{1,2})_(\d{4})(\d{2})(\d{2})00`)
+func Download(rootDir string) error {
 
-func NewScheduler(apiKey, orderId, rootDir string) (gocron.Scheduler, error) {
-
-	if err := testFetch(apiKey, orderId, rootDir); err != nil {
-		return nil, fmt.Errorf("initial run of job failed: %w", err)
+	apiKey := os.Getenv("METOFFICE_DATAHUB_API_KEY")
+	if apiKey == "" {
+		return errors.New("environment variable METOFFICE_DATAHUB_API_KEY not set")
 	}
 
-	scheduler, err := gocron.NewScheduler()
-	if err != nil {
-		return nil, fmt.Errorf("failed to create scheduler: %w", err)
+	orderId := os.Getenv("METOFFICE_ORDER_ID")
+	if orderId == "" {
+		return errors.New("environment variable METOFFICE_ORDER_ID not set")
 	}
 
-	_, err = scheduler.NewJob(
-		gocron.DailyJob(1, gocron.NewAtTimes(
-			gocron.NewAtTime(2, 00, 00),
-			gocron.NewAtTime(3, 00, 00),
-			gocron.NewAtTime(4, 00, 00),
-			gocron.NewAtTime(5, 00, 00),
-		)),
-		gocron.NewTask(testFetch, apiKey, orderId, rootDir),
-	)
-
-	if err != nil {
-		return nil, fmt.Errorf("failed to create job: %w", err)
-	}
-
-	scheduler.Start()
-	return scheduler, nil
-}
-
-func testFetch(apiKey, orderId, rootDir string) error {
-
-	client := NewDataHubClient(apiKey)
+	fileIdRegex := regexp.MustCompile(`(.*?)_ts(\d{1,2})_(\d{4})(\d{2})(\d{2})00`)
+	client := internal.NewDataHubClient(apiKey)
 	resp, err := client.GetLatest(orderId)
 	if err != nil {
 		return fmt.Errorf("failed to retrieve order %s: %w", orderId, err)

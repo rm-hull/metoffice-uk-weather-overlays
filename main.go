@@ -24,18 +24,29 @@ func main() {
 	}
 
 	apiServerCmd := &cobra.Command{
-		Use:   "api-server [--root <path>] [--port <port>] [--debug]",
+		Use:   "api-server [--port <port>] [--debug]",
 		Short: "Start HTTP API server",
 		Run: func(_ *cobra.Command, _ []string) {
 			cmd.ApiServer(rootPath, port, debug)
 		},
 	}
 
-	apiServerCmd.Flags().StringVar(&rootPath, "root", "./data/datahub", "Path to root folder")
 	apiServerCmd.Flags().IntVar(&port, "port", 8080, "Port to run HTTP server on")
 	apiServerCmd.Flags().BoolVar(&debug, "debug", false, "Enable debugging (pprof) - WARING: do not enable in production")
 
+	downloadCmd := &cobra.Command{
+		Use:   "download",
+		Short: "Initiate download",
+		Run: func(_ *cobra.Command, _ []string) {
+			if err := cmd.Download(rootPath); err != nil {
+				log.Fatalf("failed to download: %v", err)
+			}
+		},
+	}
+
+	rootCmd.PersistentFlags().StringVar(&rootPath, "root", "./data/datahub", "Path to root folder")
 	rootCmd.AddCommand(apiServerCmd)
+	rootCmd.AddCommand(downloadCmd)
 	if err = rootCmd.Execute(); err != nil {
 		log.Fatal(err)
 	}

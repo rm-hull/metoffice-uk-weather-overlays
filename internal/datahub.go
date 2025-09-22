@@ -7,7 +7,7 @@ import (
 	"log"
 	"net/http"
 
-	metoffice "github.com/rm-hull/metoffice-uk-weather-overlays/models/met_office"
+	metoffice "github.com/rm-hull/metoffice-uk-weather-overlays/internal/models/met_office"
 )
 
 type DataHubClient interface {
