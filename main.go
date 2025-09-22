@@ -24,7 +24,7 @@ func main() {
 	}
 
 	apiServerCmd := &cobra.Command{
-		Use:   "api-server [--root <path>] [--port <port>] [--debug]",
+		Use:   "api-server [--port <port>] [--debug]",
 		Short: "Start HTTP API server",
 		Run: func(_ *cobra.Command, _ []string) {
 			cmd.ApiServer(rootPath, port, debug)
@@ -35,7 +35,7 @@ func main() {
 	apiServerCmd.Flags().BoolVar(&debug, "debug", false, "Enable debugging (pprof) - WARING: do not enable in production")
 
 	downloadCmd := &cobra.Command{
-		Use:   "download [--root <path>]",
+		Use:   "download",
 		Short: "Initiate download",
 		Run: func(_ *cobra.Command, _ []string) {
 			if err := cmd.Download(rootPath); err != nil {

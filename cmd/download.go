@@ -16,12 +16,12 @@ func Download(rootDir string) error {
 
 	apiKey := os.Getenv("METOFFICE_DATAHUB_API_KEY")
 	if apiKey == "" {
-		return errors.New("environmental variable METOFFICE_DATAHUB_API_KEY not set")
+		return errors.New("environment variable METOFFICE_DATAHUB_API_KEY not set")
 	}
 
 	orderId := os.Getenv("METOFFICE_ORDER_ID")
 	if orderId == "" {
-		return errors.New("environmental variable METOFFICE_ORDER_ID not set")
+		return errors.New("environment variable METOFFICE_ORDER_ID not set")
 	}
 
 	fileIdRegex := regexp.MustCompile(`(.*?)_ts(\d{1,2})_(\d{4})(\d{2})(\d{2})00`)
