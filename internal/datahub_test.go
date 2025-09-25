@@ -119,14 +119,14 @@ func TestDataHubManager_GetLatestDataFile(t *testing.T) {
 			client:  server.Client(),
 		}
 
-		reader, err := mgr.GetLatestDataFile("test-order", "test-file")
-		assert.NoError(t, err)
-		assert.NotNil(t, reader)
+        reader, err := mgr.GetLatestDataFile("test-order", "test-file")
+        require.NoError(t, err)
+        require.NotNil(t, reader)
+        defer reader.Close()
 
-		data, err := io.ReadAll(reader)
-		assert.NoError(t, err)
-		assert.Equal(t, mockFileData, string(data))
-		assert.NoError(t, reader.Close())
+        data, err := io.ReadAll(reader)
+        require.NoError(t, err)
+        assert.Equal(t, mockFileData, string(data))
 	})
 
 	t.Run("API error response for data file", func(t *testing.T) {
