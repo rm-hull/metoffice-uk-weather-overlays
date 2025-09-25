@@ -1,22 +1,14 @@
 package internal
 
 import (
-	"bytes"
+	"fmt"
 	"io"
 	"net/http"
+	"net/http/httptest"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
-
-// MockHTTPClient is a mock implementation of http.Client for testing
-type MockHTTPClient struct {
-	DoFunc func(req *http.Request) (*http.Response, error)
-}
-
-func (m *MockHTTPClient) Do(req *http.Request) (*http.Response, error) {
-	return m.DoFunc(req)
-}
 
 func TestDataHubManager_GetLatest(t *testing.T) {
 	// Mock successful response
@@ -40,20 +32,19 @@ func TestDataHubManager_GetLatest(t *testing.T) {
 	}`
 
 	t.Run("successful response", func(t *testing.T) {
-		mockClient := &MockHTTPClient{
-			DoFunc: func(req *http.Request) (*http.Response, error) {
-				return &http.Response{
-					StatusCode: http.StatusOK,
-					Body:       io.NopCloser(bytes.NewBufferString(mockResponseJSON)),
-					Header:     make(http.Header),
-				}, nil
-			},
-		}
+		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			assert.Equal(t, "/orders/test-order/latest?dataSpec=1.1.0", r.URL.Path+"?"+r.URL.RawQuery)
+			assert.Equal(t, "test-key", r.Header.Get("apikey"))
+			assert.Equal(t, "application/json", r.Header.Get("Accept"))
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(mockResponseJSON))
+		}))
+		defer server.Close()
 
 		mgr := &DataHubManager{
-			baseUrl: "http://test-url",
+			baseUrl: server.URL,
 			apiKey:  "test-key",
-			client:  mockClient,
+			client:  server.Client(),
 		}
 
 		resp, err := mgr.GetLatest("test-order")
@@ -65,44 +56,41 @@ func TestDataHubManager_GetLatest(t *testing.T) {
 	})
 
 	t.Run("API error response", func(t *testing.T) {
-		mockClient := &MockHTTPClient{
-			DoFunc: func(req *http.Request) (*http.Response, error) {
-				return &http.Response{
-					StatusCode: http.StatusInternalServerError,
-					Status:     "500 Internal Server Error",
-					Body:       io.NopCloser(bytes.NewBufferString("Internal Server Error")),
-					Header:     make(http.Header),
-				}, nil
-			},
-		}
+		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			assert.Equal(t, "/orders/test-order/latest?dataSpec=1.1.0", r.URL.Path+"?"+r.URL.RawQuery)
+			assert.Equal(t, "test-key", r.Header.Get("apikey"))
+			assert.Equal(t, "application/json", r.Header.Get("Accept"))
+			w.WriteHeader(http.StatusInternalServerError)
+			_, _ = w.Write([]byte("Internal Server Error"))
+		}))
+		defer server.Close()
 
 		mgr := &DataHubManager{
-			baseUrl: "http://test-url",
+			baseUrl: server.URL,
 			apiKey:  "test-key",
-			client:  mockClient,
+			client:  server.Client(),
 		}
 
 		resp, err := mgr.GetLatest("test-order")
 		assert.Error(t, err)
 		assert.Nil(t, resp)
-		assert.Equal(t, "http status response from http://test-url/orders/test-order/latest?dataSpec=1.1.0: 500 Internal Server Error", err.Error())
+		assert.Equal(t, fmt.Sprintf("http status response from %s/orders/test-order/latest?dataSpec=1.1.0: 500 Internal Server Error", server.URL), err.Error())
 	})
 
 	t.Run("invalid JSON response", func(t *testing.T) {
-		mockClient := &MockHTTPClient{
-			DoFunc: func(req *http.Request) (*http.Response, error) {
-				return &http.Response{
-					StatusCode: http.StatusOK,
-					Body:       io.NopCloser(bytes.NewBufferString(`{"invalid json"`)),
-					Header:     make(http.Header),
-				}, nil
-			},
-		}
+		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			assert.Equal(t, "/orders/test-order/latest?dataSpec=1.1.0", r.URL.Path+"?"+r.URL.RawQuery)
+			assert.Equal(t, "test-key", r.Header.Get("apikey"))
+			assert.Equal(t, "application/json", r.Header.Get("Accept"))
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(`{"invalid json"`))
+		}))
+		defer server.Close()
 
 		mgr := &DataHubManager{
-			baseUrl: "http://test-url",
+			baseUrl: server.URL,
 			apiKey:  "test-key",
-			client:  mockClient,
+			client:  server.Client(),
 		}
 
 		resp, err := mgr.GetLatest("test-order")
@@ -116,20 +104,19 @@ func TestDataHubManager_GetLatestDataFile(t *testing.T) {
 	mockFileData := "this is mock image data"
 
 	t.Run("successful data file retrieval", func(t *testing.T) {
-		mockClient := &MockHTTPClient{
-			DoFunc: func(req *http.Request) (*http.Response, error) {
-				return &http.Response{
-					StatusCode: http.StatusOK,
-					Body:       io.NopCloser(bytes.NewBufferString(mockFileData)),
-					Header:     make(http.Header),
-				}, nil
-			},
-		}
+		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			assert.Equal(t, "/orders/test-order/latest/test-file/data?dataSpec=1.1.0", r.URL.Path+"?"+r.URL.RawQuery)
+			assert.Equal(t, "test-key", r.Header.Get("apikey"))
+			assert.Equal(t, "image/png", r.Header.Get("Accept"))
+			w.WriteHeader(http.StatusOK)
+			_, _ = w.Write([]byte(mockFileData))
+		}))
+		defer server.Close()
 
 		mgr := &DataHubManager{
-			baseUrl: "http://test-url",
+			baseUrl: server.URL,
 			apiKey:  "test-key",
-			client:  mockClient,
+			client:  server.Client(),
 		}
 
 		reader, err := mgr.GetLatestDataFile("test-order", "test-file")
@@ -143,26 +130,24 @@ func TestDataHubManager_GetLatestDataFile(t *testing.T) {
 	})
 
 	t.Run("API error response for data file", func(t *testing.T) {
-		mockClient := &MockHTTPClient{
-			DoFunc: func(req *http.Request) (*http.Response, error) {
-				return &http.Response{
-					StatusCode: http.StatusNotFound,
-					Status:     "404 Not Found",
-					Body:       io.NopCloser(bytes.NewBufferString("Not Found")),
-					Header:     make(http.Header),
-				}, nil
-			},
-		}
+		server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			assert.Equal(t, "/orders/test-order/latest/test-file/data?dataSpec=1.1.0", r.URL.Path+"?"+r.URL.RawQuery)
+			assert.Equal(t, "test-key", r.Header.Get("apikey"))
+			assert.Equal(t, "image/png", r.Header.Get("Accept"))
+			w.WriteHeader(http.StatusNotFound)
+			_, _ = w.Write([]byte("Not Found"))
+		}))
+		defer server.Close()
 
 		mgr := &DataHubManager{
-			baseUrl: "http://test-url",
+			baseUrl: server.URL,
 			apiKey:  "test-key",
-			client:  mockClient,
+			client:  server.Client(),
 		}
 
 		reader, err := mgr.GetLatestDataFile("test-order", "test-file")
 		assert.Error(t, err)
 		assert.Nil(t, reader)
-		assert.Equal(t, "http status response from http://test-url/orders/test-order/latest/test-file/data?dataSpec=1.1.0: 404 Not Found", err.Error())
+		assert.Equal(t, fmt.Sprintf("http status response from %s/orders/test-order/latest/test-file/data?dataSpec=1.1.0: 404 Not Found", server.URL), err.Error())
 	})
 }

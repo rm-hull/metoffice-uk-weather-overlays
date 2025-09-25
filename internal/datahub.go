@@ -15,14 +15,10 @@ type DataHubClient interface {
 	GetLatestDataFile(orderId, fileId string) (io.ReadCloser, error)
 }
 
-type HTTPClient interface {
-	Do(req *http.Request) (*http.Response, error)
-}
-
 type DataHubManager struct {
 	baseUrl string
 	apiKey  string
-	client  HTTPClient
+	client  *http.Client
 }
 
 func NewDataHubClient(apiKey string) DataHubClient {
