@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestDataHubManager_GetLatest(t *testing.T) {
@@ -119,14 +120,14 @@ func TestDataHubManager_GetLatestDataFile(t *testing.T) {
 			client:  server.Client(),
 		}
 
-        reader, err := mgr.GetLatestDataFile("test-order", "test-file")
-        require.NoError(t, err)
-        require.NotNil(t, reader)
-        defer reader.Close()
+		reader, err := mgr.GetLatestDataFile("test-order", "test-file")
+		require.NoError(t, err)
+		require.NotNil(t, reader)
 
-        data, err := io.ReadAll(reader)
-        require.NoError(t, err)
-        assert.Equal(t, mockFileData, string(data))
+		data, err := io.ReadAll(reader)
+		require.NoError(t, err)
+		require.NoError(t, reader.Close())
+		assert.Equal(t, mockFileData, string(data))
 	})
 
 	t.Run("API error response for data file", func(t *testing.T) {
