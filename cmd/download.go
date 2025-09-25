@@ -13,6 +13,9 @@ import (
 )
 
 func Download(rootDir string) error {
+	internal.GitVersion()
+	internal.UserInfo()
+	internal.EnvironmentVars()
 
 	apiKey := os.Getenv("METOFFICE_DATAHUB_API_KEY")
 	if apiKey == "" {
