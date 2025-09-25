@@ -14,7 +14,7 @@ import (
 )
 
 func ShowVersion() {
-	log.Printf("Version: %s\n", versioninfo.Short())
+	log.Printf("Version: %s", versioninfo.Short())
 }
 
 func EnvironmentVars() {
