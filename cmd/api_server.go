@@ -8,16 +8,16 @@ import (
 	"github.com/Depado/ginprom"
 	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
-	"github.com/rm-hull/metoffice-uk-weather-overlays/internal"
+	"github.com/rm-hull/godx"
 	healthcheck "github.com/tavsec/gin-healthcheck"
 	"github.com/tavsec/gin-healthcheck/checks"
 	hc_config "github.com/tavsec/gin-healthcheck/config"
 )
 
 func ApiServer(rootDir string, port int, debug bool) {
-	internal.GitVersion()
-	internal.UserInfo()
-	internal.EnvironmentVars()
+	godx.GitVersion()
+	godx.UserInfo()
+	godx.EnvironmentVars()
 
 	r := gin.New()
 
