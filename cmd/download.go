@@ -78,12 +78,12 @@ func Download(rootDir string) error {
 		if err != nil {
 			return fmt.Errorf("failed to retrieve datafile %s for order %s: %w", file.FileId, orderId, err)
 		}
-		defer func() {
-			if err := inFile.Close(); err != nil {
-				// Log the error, but don't return it as it might mask a more important error
-				fmt.Printf("warning: failed to close input file %s: %v\n", file.FileId, err)
-			}
-		}()
+        defer func() {
+            if err := inFile.Close(); err != nil {
+                // Log the error, but don't return it as it might mask a more important error
+                fmt.Fprintf(os.Stderr, "warning: failed to close input file %s: %v\n", file.FileId, err)
+            }
+        }()
 
 		tmpFile, err := os.CreateTemp(path, "download-*.tmp")
 		if err != nil {
