@@ -30,7 +30,7 @@ func NewDataHubClient(apiKey string) DataHubClient {
 }
 
 func (mgr *DataHubManager) GetLatest(orderId string) (*metoffice.Response, error) {
-	url := fmt.Sprintf("%s/orders/%s/latest", mgr.baseUrl, orderId)
+	url := fmt.Sprintf("%s/orders/%s/latest?dataSpec=1.1.0", mgr.baseUrl, orderId)
 	body, err := mgr.get(url, "application/json")
 	if err != nil {
 		return nil, err
@@ -51,7 +51,7 @@ func (mgr *DataHubManager) GetLatest(orderId string) (*metoffice.Response, error
 }
 
 func (mgr *DataHubManager) GetLatestDataFile(orderId, fileId string) (io.ReadCloser, error) {
-	url := fmt.Sprintf("%s/orders/%s/latest/%s/data", mgr.baseUrl, orderId, fileId)
+	url := fmt.Sprintf("%s/orders/%s/latest/%s/data?dataSpec=1.1.0", mgr.baseUrl, orderId, fileId)
 	return mgr.get(url, "image/png")
 }
 
