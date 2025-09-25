@@ -15,10 +15,14 @@ type DataHubClient interface {
 	GetLatestDataFile(orderId, fileId string) (io.ReadCloser, error)
 }
 
+type HTTPClient interface {
+	Do(req *http.Request) (*http.Response, error)
+}
+
 type DataHubManager struct {
 	baseUrl string
 	apiKey  string
-	client  *http.Client
+	client  HTTPClient
 }
 
 func NewDataHubClient(apiKey string) DataHubClient {
@@ -70,11 +74,8 @@ func (mgr *DataHubManager) get(url string, acceptHeader string) (io.ReadCloser, 
 	}
 
 	if res.StatusCode > 299 {
-		if err := res.Body.Close(); err != nil {
-			log.Printf("failed to close body: %v", err)
-		}
+		_ = res.Body.Close()
 		return nil, fmt.Errorf("http status response from %s: %s", url, res.Status)
 	}
-
 	return res.Body, nil
 }

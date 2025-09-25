@@ -78,12 +78,21 @@ func Download(rootDir string) error {
 		if err != nil {
 			return fmt.Errorf("failed to retrieve datafile %s for order %s: %w", file.FileId, orderId, err)
 		}
+		defer func() {
+			if err := inFile.Close(); err != nil {
+				// Log the error, but don't return it as it might mask a more important error
+				fmt.Printf("warning: failed to close input file %s: %v\n", file.FileId, err)
+			}
+		}()
 
 		tmpFile, err := os.CreateTemp(path, "download-*.tmp")
 		if err != nil {
-			_ = inFile.Close()
 			return fmt.Errorf("failed to create temporary file: %w", err)
 		}
+		defer func() {
+			_ = tmpFile.Close()
+			_ = os.Remove(tmpFile.Name())
+		}()
 
 		var processingErr error
 		if kind == "total_precipitation_rate" {
@@ -92,27 +101,24 @@ func Download(rootDir string) error {
 			_, processingErr = io.Copy(tmpFile, inFile)
 		}
 
-		// Always close files and check for errors
-		inFileCloseErr := inFile.Close()
-		tmpFileCloseErr := tmpFile.Close()
-
 		if processingErr != nil {
-			_ = os.Remove(tmpFile.Name())
 			return fmt.Errorf("failed to process data file: %w", processingErr)
 		}
-		if inFileCloseErr != nil {
-			_ = os.Remove(tmpFile.Name())
-			return fmt.Errorf("failed to close input file: %w", inFileCloseErr)
-		}
-		if tmpFileCloseErr != nil {
-			_ = os.Remove(tmpFile.Name())
-			return fmt.Errorf("failed to close temporary file: %w", tmpFileCloseErr)
+
+		// Close tmpFile before renaming to ensure all data is flushed
+		if err := tmpFile.Close(); err != nil {
+			return fmt.Errorf("failed to close temporary file before rename: %w", err)
 		}
 
 		if err := os.Rename(tmpFile.Name(), filename); err != nil {
-			_ = os.Remove(tmpFile.Name())
 			return fmt.Errorf("failed to rename temporary file: %w", err)
 		}
+		// If rename is successful, cancel the deferred removal of the temporary file
+		// by re-deferring a no-op or setting a flag. For simplicity, we'll just let the defer run
+		// and handle the error if the file is already gone (which it will be).
+		// A more robust solution would involve a flag or a custom defer stack.
+		// For now, the os.Remove will just fail silently if the file is already gone.
+		// This is acceptable for a temporary file that has been renamed.
 	}
 
 	return nil
