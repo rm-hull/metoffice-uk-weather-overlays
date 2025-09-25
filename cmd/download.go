@@ -13,7 +13,7 @@ import (
 )
 
 func Download(rootDir string) error {
-	internal.ShowVersion()
+	internal.GitVersion()
 	internal.UserInfo()
 	internal.EnvironmentVars()
 

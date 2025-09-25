@@ -13,7 +13,7 @@ import (
 	"github.com/earthboundkid/versioninfo/v2"
 )
 
-func ShowVersion() {
+func GitVersion() {
 	log.Printf("Version: %s", versioninfo.Short())
 }
 
@@ -31,9 +31,9 @@ func EnvironmentVars() {
 	for _, entry := range environ {
 		kv := strings.SplitN(entry, "=", 2)
 		if sensitiveRegex.MatchString(kv[0]) {
-			log.Printf("  %s: ********\n", kv[0])
+			log.Printf("  %s: ********", kv[0])
 		} else {
-			log.Printf("  %s: %s\n", kv[0], kv[1])
+			log.Printf("  %s: %s", kv[0], kv[1])
 		}
 	}
 }

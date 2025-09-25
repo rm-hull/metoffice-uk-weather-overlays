@@ -15,7 +15,7 @@ import (
 )
 
 func ApiServer(rootDir string, port int, debug bool) {
-	internal.ShowVersion()
+	internal.GitVersion()
 	internal.UserInfo()
 	internal.EnvironmentVars()
 
