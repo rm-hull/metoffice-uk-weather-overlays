@@ -70,11 +70,8 @@ func (mgr *DataHubManager) get(url string, acceptHeader string) (io.ReadCloser, 
 	}
 
 	if res.StatusCode > 299 {
-		if err := res.Body.Close(); err != nil {
-			log.Printf("failed to close body: %v", err)
-		}
+		_ = res.Body.Close()
 		return nil, fmt.Errorf("http status response from %s: %s", url, res.Status)
 	}
-
 	return res.Body, nil
 }
