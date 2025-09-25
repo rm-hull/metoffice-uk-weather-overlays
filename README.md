@@ -29,7 +29,7 @@ These instructions will get you a copy of the project up and running on your loc
 
 2.  **Set up environment variables:**
     Create a `.env` file in the project root directory based on `.env.example`:
-    ```
+    ```sh
     METOFFICE_DATAHUB_API_KEY=your_api_key_here
     METOFFICE_ORDER_ID=your_order_id_here
     ```
