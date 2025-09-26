@@ -71,7 +71,7 @@ require (
 	github.com/modern-go/concurrent v0.0.0-20180306012644-bacd9c7ef1dd // indirect
 	github.com/modern-go/reflect2 v1.0.2 // indirect
 	github.com/pelletier/go-toml/v2 v2.2.4 // indirect
-	github.com/rm-hull/godx v0.0.1
+	github.com/rm-hull/godx v0.0.2
 	github.com/spf13/cobra v1.10.1
 	github.com/tavsec/gin-healthcheck v1.7.10
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
