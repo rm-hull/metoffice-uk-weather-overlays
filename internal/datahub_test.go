@@ -48,7 +48,7 @@ func TestDataHubManager_GetLatest(t *testing.T) {
 			client:  server.Client(),
 		}
 
-		resp, err := mgr.GetLatest("test-order")
+		resp, err := mgr.GetLatest("test-order", NewQueryParams("dataSpec", "1.1.0"))
 		assert.NoError(t, err)
 		assert.NotNil(t, resp)
 		assert.Equal(t, "test-order", resp.OrderDetails.Order.OrderId)
@@ -72,7 +72,7 @@ func TestDataHubManager_GetLatest(t *testing.T) {
 			client:  server.Client(),
 		}
 
-		resp, err := mgr.GetLatest("test-order")
+		resp, err := mgr.GetLatest("test-order", NewQueryParams("dataSpec", "1.1.0"))
 		assert.Error(t, err)
 		assert.Nil(t, resp)
 		assert.Equal(t, fmt.Sprintf("http status response from %s/orders/test-order/latest?dataSpec=1.1.0: 500 Internal Server Error", server.URL), err.Error())
@@ -94,7 +94,7 @@ func TestDataHubManager_GetLatest(t *testing.T) {
 			client:  server.Client(),
 		}
 
-		resp, err := mgr.GetLatest("test-order")
+		resp, err := mgr.GetLatest("test-order", NewQueryParams("dataSpec", "1.1.0"))
 		assert.Error(t, err)
 		assert.Nil(t, resp)
 		assert.Contains(t, err.Error(), "failed to unmarshal response")
@@ -120,7 +120,7 @@ func TestDataHubManager_GetLatestDataFile(t *testing.T) {
 			client:  server.Client(),
 		}
 
-		reader, err := mgr.GetLatestDataFile("test-order", "test-file")
+		reader, err := mgr.GetLatestDataFile("test-order", "test-file", NewQueryParams("dataSpec", "1.1.0"))
 		require.NoError(t, err)
 		require.NotNil(t, reader)
 
@@ -146,7 +146,7 @@ func TestDataHubManager_GetLatestDataFile(t *testing.T) {
 			client:  server.Client(),
 		}
 
-		reader, err := mgr.GetLatestDataFile("test-order", "test-file")
+		reader, err := mgr.GetLatestDataFile("test-order", "test-file", NewQueryParams("dataSpec", "1.1.0"))
 		assert.Error(t, err)
 		assert.Nil(t, reader)
 		assert.Equal(t, fmt.Sprintf("http status response from %s/orders/test-order/latest/test-file/data?dataSpec=1.1.0: 404 Not Found", server.URL), err.Error())

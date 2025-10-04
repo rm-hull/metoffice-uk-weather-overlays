@@ -11,8 +11,8 @@ import (
 )
 
 type DataHubClient interface {
-	GetLatest(orderId string) (*metoffice.Response, error)
-	GetLatestDataFile(orderId, fileId string) (io.ReadCloser, error)
+	GetLatest(orderId string, params QueryParams) (*metoffice.Response, error)
+	GetLatestDataFile(orderId, fileId string, params QueryParams) (io.ReadCloser, error)
 }
 
 type DataHubManager struct {
@@ -29,8 +29,8 @@ func NewDataHubClient(apiKey string) DataHubClient {
 	}
 }
 
-func (mgr *DataHubManager) GetLatest(orderId string) (*metoffice.Response, error) {
-	url := fmt.Sprintf("%s/orders/%s/latest?dataSpec=1.1.0", mgr.baseUrl, orderId)
+func (mgr *DataHubManager) GetLatest(orderId string, params QueryParams) (*metoffice.Response, error) {
+	url := fmt.Sprintf("%s/orders/%s/latest%s", mgr.baseUrl, orderId, params.toString())
 	body, err := mgr.get(url, "application/json")
 	if err != nil {
 		return nil, err
@@ -50,8 +50,8 @@ func (mgr *DataHubManager) GetLatest(orderId string) (*metoffice.Response, error
 	return &resp, nil
 }
 
-func (mgr *DataHubManager) GetLatestDataFile(orderId, fileId string) (io.ReadCloser, error) {
-	url := fmt.Sprintf("%s/orders/%s/latest/%s/data?dataSpec=1.1.0", mgr.baseUrl, orderId, fileId)
+func (mgr *DataHubManager) GetLatestDataFile(orderId, fileId string, params QueryParams) (io.ReadCloser, error) {
+	url := fmt.Sprintf("%s/orders/%s/latest/%s/data%s", mgr.baseUrl, orderId, fileId, params.toString())
 	return mgr.get(url, "image/png")
 }
 
@@ -74,4 +74,37 @@ func (mgr *DataHubManager) get(url string, acceptHeader string) (io.ReadCloser, 
 		return nil, fmt.Errorf("http status response from %s: %s", url, res.Status)
 	}
 	return res.Body, nil
+}
+
+type QueryParams map[string]string
+
+func NewQueryParams(keypairs ...string) QueryParams {
+	if len(keypairs)%2 != 0 {
+		panic("NewQueryParams requires an even number of arguments")
+	}
+	params := make(QueryParams)
+	for i := 0; i < len(keypairs); i += 2 {
+		params[keypairs[i]] = keypairs[i+1]
+	}
+	return params
+}
+
+func (q *QueryParams) Add(s string, param2 string) {
+	(*q)[s] = param2
+}
+
+func (q *QueryParams) toString() string {
+	if q == nil || len(*q) == 0 {
+		return ""
+	}
+	s := "?"
+	first := true
+	for k, v := range *q {
+		if !first {
+			s += "&"
+		}
+		s += fmt.Sprintf("%s=%s", k, v)
+		first = false
+	}
+	return s
 }

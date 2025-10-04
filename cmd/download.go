@@ -3,6 +3,7 @@ package cmd
 import (
 	"errors"
 	"fmt"
+	"image/color"
 	"io"
 	"os"
 	"regexp"
@@ -30,7 +31,7 @@ func Download(rootDir string) error {
 
 	fileIdRegex := regexp.MustCompile(`(.*?)_ts(\d{1,2})_(\d{4})(\d{2})(\d{2})00`)
 	client := internal.NewDataHubClient(apiKey)
-	resp, err := client.GetLatest(orderId)
+	resp, err := client.GetLatest(orderId, internal.NewQueryParams("dataSpec", "1.1.0"))
 	if err != nil {
 		return fmt.Errorf("failed to retrieve order %s: %w", orderId, err)
 	}
@@ -75,7 +76,11 @@ func Download(rootDir string) error {
 			return err
 		}
 
-		inFile, err := client.GetLatestDataFile(resp.OrderDetails.Order.OrderId, file.FileId)
+		params := internal.NewQueryParams("dataSpec", "1.1.0")
+		if kind == "cloud_amount_total" {
+			params.Add("styleName", "iso_fill_bu_gn_30_100_pc")
+		}
+		inFile, err := client.GetLatestDataFile(resp.OrderDetails.Order.OrderId, file.FileId, params)
 		if err != nil {
 			return fmt.Errorf("failed to retrieve datafile %s for order %s: %w", file.FileId, orderId, err)
 		}
@@ -96,9 +101,12 @@ func Download(rootDir string) error {
 		}()
 
 		var processingErr error
-		if kind == "total_precipitation_rate" {
-			processingErr = png.Smooth(inFile, tmpFile, 50, 1.0)
-		} else {
+		switch kind {
+		case "total_precipitation_rate":
+			processingErr = png.Smooth(inFile, tmpFile, 50, 1.0, color.White)
+		case "cloud_amount_total":
+			processingErr = png.Smooth(inFile, tmpFile, 250, 1.0, color.NRGBA{R: 0, G: 0xff, B: 0, A: 0xff})
+		default:
 			_, processingErr = io.Copy(tmpFile, inFile)
 		}
 
