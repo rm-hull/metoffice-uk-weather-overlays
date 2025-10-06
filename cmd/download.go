@@ -61,6 +61,9 @@ type Processor struct {
 }
 
 func NewDownloader(rootDir string, poolSize int, apiKey, orderId string) (*Processor, error) {
+	if poolSize < 1 {
+		return nil, errors.New("pool size must be at least 1")
+	}
 	startTime := time.Now()
 	orderId = url.QueryEscape(orderId)
 	client := internal.NewDataHubClient(apiKey)
