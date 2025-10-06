@@ -6,6 +6,7 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"net/url"
 
 	metoffice "github.com/rm-hull/metoffice-uk-weather-overlays/internal/models/met_office"
 )
