@@ -3,7 +3,7 @@ package cmd
 import (
 	"errors"
 	"fmt"
-	"io"
+	"image/color"
 	"os"
 	"regexp"
 	"strconv"
@@ -11,6 +11,7 @@ import (
 	"github.com/rm-hull/godx"
 	"github.com/rm-hull/metoffice-uk-weather-overlays/internal"
 	"github.com/rm-hull/metoffice-uk-weather-overlays/internal/png"
+	"github.com/rm-hull/metoffice-uk-weather-overlays/internal/png/stage"
 )
 
 func Download(rootDir string) error {
@@ -30,7 +31,7 @@ func Download(rootDir string) error {
 
 	fileIdRegex := regexp.MustCompile(`(.*?)_ts(\d{1,2})_(\d{4})(\d{2})(\d{2})00`)
 	client := internal.NewDataHubClient(apiKey)
-	resp, err := client.GetLatest(orderId)
+	resp, err := client.GetLatest(orderId, internal.NewQueryParams("dataSpec", "1.1.0"))
 	if err != nil {
 		return fmt.Errorf("failed to retrieve order %s: %w", orderId, err)
 	}
@@ -46,6 +47,23 @@ func Download(rootDir string) error {
 			return "", err
 		}
 		return path, nil
+	}
+
+	pipelines := map[string][]png.PipelineStage{
+		"total_precipitation_rate": {
+			&stage.ReplaceColorStage{Tolerance: 50, Replace: color.White},
+			&stage.GaussianBlurStage{Sigma: 1.0},
+			&stage.ResampleStage{},
+		},
+		"cloud_amount_total": {
+			&stage.ReplaceColorStage{Tolerance: 250, Replace: color.NRGBA{R: 0, G: 0xff, B: 0, A: 0xff}},
+			&stage.GreyscaleStage{},
+			&stage.GaussianBlurStage{Sigma: 1.0},
+			&stage.ResampleStage{},
+		},
+		// NoOp's
+		"mean_sea_level_pressure": {},
+		"temperature_at_surface":  {},
 	}
 
 	for _, file := range resp.OrderDetails.Files {
@@ -75,7 +93,11 @@ func Download(rootDir string) error {
 			return err
 		}
 
-		inFile, err := client.GetLatestDataFile(resp.OrderDetails.Order.OrderId, file.FileId)
+		params := internal.NewQueryParams("dataSpec", "1.1.0")
+		if kind == "cloud_amount_total" {
+			params.Add("styleName", "iso_fill_bu_gn_30_100_pc")
+		}
+		inFile, err := client.GetLatestDataFile(resp.OrderDetails.Order.OrderId, file.FileId, params)
 		if err != nil {
 			return fmt.Errorf("failed to retrieve datafile %s for order %s: %w", file.FileId, orderId, err)
 		}
@@ -95,15 +117,22 @@ func Download(rootDir string) error {
 			_ = os.Remove(tmpFile.Name())
 		}()
 
-		var processingErr error
-		if kind == "total_precipitation_rate" {
-			processingErr = png.Smooth(inFile, tmpFile, 50, 1.0)
-		} else {
-			_, processingErr = io.Copy(tmpFile, inFile)
+		pipeline := pipelines[kind]
+		if pipeline == nil {
+			return fmt.Errorf("no processing pipeline defined for data type %s", kind)
 		}
 
-		if processingErr != nil {
-			return fmt.Errorf("failed to process data file: %w", processingErr)
+		img, err := png.NewPngFromReader(inFile)
+		if err != nil {
+			return fmt.Errorf("failed to decode PNG from data file: %w", err)
+		}
+
+		if err := img.Pipeline(pipeline...); err != nil {
+			return fmt.Errorf("failed to process image pipeline: %w", err)
+		}
+
+		if err := img.Write(tmpFile); err != nil {
+			return fmt.Errorf("failed to write processed image to temporary file: %w", err)
 		}
 
 		// Close tmpFile before renaming to ensure all data is flushed
