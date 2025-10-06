@@ -65,16 +65,21 @@ func (mgr *DataHubManager) get(url string, acceptHeader string) (io.ReadCloser, 
 	req.Header.Set("apikey", mgr.apiKey)
 	req.Header.Set("Accept", acceptHeader)
 
-	res, err := mgr.client.Do(req)
+	resp, err := mgr.client.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch from %s: %w", url, err)
 	}
 
-	if res.StatusCode > 299 {
-		_ = res.Body.Close()
-		return nil, fmt.Errorf("http status response from %s: %s", url, res.Status)
+	if resp.StatusCode == 429 {
+		_ = resp.Body.Close()
+		return nil, fmt.Errorf("rate limit exceeded when accessing %s: %s -- retry-after: %s", url, resp.Status, resp.Header.Get("Retry-After"))
 	}
-	return res.Body, nil
+
+	if resp.StatusCode > 299 {
+		_ = resp.Body.Close()
+		return nil, fmt.Errorf("http status response from %s: %s", url, resp.Status)
+	}
+	return resp.Body, nil
 }
 
 type QueryParams map[string]string

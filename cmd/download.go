@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"image/color"
 	"log"
+	"net/url"
 	"os"
 	"path/filepath"
 	"regexp"
@@ -42,12 +43,12 @@ func init() {
 }
 
 func createPath(rootDir string, matches []string) (string, error) {
-    path := filepath.Join(rootDir,
-        matches[1], // type
-        matches[3], // year
-        matches[4], // month
-        matches[5], // day
-    )
+	path := filepath.Join(rootDir,
+		matches[1], // type
+		matches[3], // year
+		matches[4], // month
+		matches[5], // day
+	)
 	if err := os.MkdirAll(path, 0755); err != nil {
 		return "", err
 	}
@@ -68,6 +69,9 @@ func Download(rootDir string, poolSize int) error {
 	if orderId == "" {
 		return errors.New("environment variable METOFFICE_ORDER_ID not set")
 	}
+
+	// URLencode orderId for safety
+	orderId = url.QueryEscape(orderId)
 
 	client := internal.NewDataHubClient(apiKey)
 	resp, err := client.GetLatest(orderId, internal.NewQueryParams("dataSpec", "1.1.0"))
