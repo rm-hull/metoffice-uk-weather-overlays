@@ -97,14 +97,14 @@ func (q *QueryParams) toString() string {
 	if q == nil || len(*q) == 0 {
 		return ""
 	}
-	s := "?"
-	first := true
+
+	values := make(url.Values)
 	for k, v := range *q {
-		if !first {
-			s += "&"
-		}
-		s += fmt.Sprintf("%s=%s", k, v)
-		first = false
+		values.Set(k, v)
 	}
-	return s
+
+	// The Encode method handles URL encoding and joins with '&'.
+	// It also sorts keys for deterministic output.
+	return "?" + values.Encode()
+
 }
