@@ -26,6 +26,17 @@ func Smooth(r io.Reader, w io.Writer, tolerance float64, sigma float64, replace 
 	replaceR, replaceG, replaceB, _ := replace.RGBA()
 	rR, rG, rB := float64(replaceR>>8), float64(replaceG>>8), float64(replaceB>>8)
 
+	// 1. Replace specified color with transparency
+	//    with alpha scaled by distance from color within tolerance
+	//    (i.e. pixels close to the target color become more transparent)
+	//
+	//    This helps avoid hard edges when blurring later
+	//
+	//    Note: this is done in RGBA space which is not perceptually uniform
+	//          but is good enough for our purposes here
+	//
+	//    See: https://en.wikipedia.org/wiki/Alpha_compositing#Description
+	//         https://en.wikipedia.org/wiki/Color_difference
 	// Loop over pixels
 	for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
 		for x := bounds.Min.X; x < bounds.Max.X; x++ {
@@ -45,7 +56,8 @@ func Smooth(r io.Reader, w io.Writer, tolerance float64, sigma float64, replace 
 		}
 	}
 
-	// If greyscale is true, convert to greyscale before blur
+	// 2. If greyscale is true, convert to greyscale before blur
+	//	This is useful for cloud amount to avoid color tints after blurring
 	var imgForBlur image.Image = out
 	if greyscale {
 		gs := image.NewNRGBA(bounds)
@@ -65,10 +77,27 @@ func Smooth(r io.Reader, w io.Writer, tolerance float64, sigma float64, replace 
 		imgForBlur = gs
 	}
 
-	// Apply Gaussian blur to the (possibly greyscale) image
+	// 3. Apply Gaussian blur to the (possibly greyscale) image
+	//	This helps smooth edges created by color replacement above
+	//
+	//	Note: bild/blur.Gaussian uses a fast approximation which is good enough here
+	//
+	//	See: https://pkg.go.dev/github.com/anthonynsimon/bild/blur#Gaussian
 	blurred := blur.Gaussian(imgForBlur, sigma)
 
-	// Now smooth edges with bicubic-like resampling
+	// 4. Now smooth edges with bicubic-like resampling
+	//	This helps reduce any remaining artifacts from the blur step
+	//
+	//	See: https://pkg.go.dev/golang.org/x/image/draw#CatmullRom
+	//
+	//	Note: this is a bit of a hack but works well enough for our purposes here
+	//	      as we are scaling to the same size (i.e. no actual scaling)
+	//
+	//	      We could use a proper bicubic filter but this is simpler and good enough
+	//
+	//	      See: https://en.wikipedia.org/wiki/Bicubic_interpolation
+	//	           https://en.wikipedia.org/wiki/Image_scaling
+	//
 	smoothed := image.NewNRGBA(bounds)
 	draw.CatmullRom.Scale(smoothed, bounds, blurred, bounds, draw.Over, nil)
 
