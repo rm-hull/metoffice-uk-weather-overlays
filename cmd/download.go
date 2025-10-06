@@ -4,52 +4,23 @@ import (
 	"errors"
 	"fmt"
 	"image/color"
+	"log"
 	"os"
 	"regexp"
 	"strconv"
 
 	"github.com/rm-hull/godx"
 	"github.com/rm-hull/metoffice-uk-weather-overlays/internal"
+	metoffice "github.com/rm-hull/metoffice-uk-weather-overlays/internal/models/met_office"
 	"github.com/rm-hull/metoffice-uk-weather-overlays/internal/png"
 	"github.com/rm-hull/metoffice-uk-weather-overlays/internal/png/stage"
 )
 
-func Download(rootDir string) error {
-	godx.GitVersion()
-	godx.UserInfo()
-	godx.EnvironmentVars()
+var pipelines map[string][]png.PipelineStage
+var fileIdRegex *regexp.Regexp
 
-	apiKey := os.Getenv("METOFFICE_DATAHUB_API_KEY")
-	if apiKey == "" {
-		return errors.New("environment variable METOFFICE_DATAHUB_API_KEY not set")
-	}
-
-	orderId := os.Getenv("METOFFICE_ORDER_ID")
-	if orderId == "" {
-		return errors.New("environment variable METOFFICE_ORDER_ID not set")
-	}
-
-	fileIdRegex := regexp.MustCompile(`(.*?)_ts(\d{1,2})_(\d{4})(\d{2})(\d{2})00`)
-	client := internal.NewDataHubClient(apiKey)
-	resp, err := client.GetLatest(orderId, internal.NewQueryParams("dataSpec", "1.1.0"))
-	if err != nil {
-		return fmt.Errorf("failed to retrieve order %s: %w", orderId, err)
-	}
-
-	createPath := func(matches []string) (string, error) {
-		path := fmt.Sprintf("%s/%s/%s/%s/%s", rootDir,
-			matches[1], // type
-			matches[3], // year
-			matches[4], // month
-			matches[5], // day
-		)
-		if err := os.MkdirAll(path, 0755); err != nil {
-			return "", err
-		}
-		return path, nil
-	}
-
-	pipelines := map[string][]png.PipelineStage{
+func init() {
+	pipelines = map[string][]png.PipelineStage{
 		"total_precipitation_rate": {
 			&stage.ReplaceColorStage{Tolerance: 50, Replace: color.White},
 			&stage.GaussianBlurStage{Sigma: 1.0},
@@ -66,89 +37,183 @@ func Download(rootDir string) error {
 		"temperature_at_surface":  {},
 	}
 
-	for _, file := range resp.OrderDetails.Files {
-		matches := fileIdRegex.FindStringSubmatch(file.FileId)
-		if matches == nil {
-			continue
-		}
+	fileIdRegex = regexp.MustCompile(`(.*?)_ts(\d{1,2})_(\d{4})(\d{2})(\d{2})00`)
+}
 
-		path, err := createPath(matches)
-		if err != nil {
-			return fmt.Errorf("failed to create path: %w", err)
-		}
+func createPath(rootDir string, matches []string) (string, error) {
+	path := fmt.Sprintf("%s/%s/%s/%s/%s", rootDir,
+		matches[1], // type
+		matches[3], // year
+		matches[4], // month
+		matches[5], // day
+	)
+	if err := os.MkdirAll(path, 0755); err != nil {
+		return "", err
+	}
+	return path, nil
+}
 
-		hour, err := strconv.Atoi(matches[2])
-		if err != nil {
-			return fmt.Errorf("failed to convert %s to integer: %w", matches[2], err)
-		}
+func Download(rootDir string, poolSize int) error {
+	godx.GitVersion()
+	godx.UserInfo()
+	godx.EnvironmentVars()
 
-		kind := matches[1]
-		filename := fmt.Sprintf("%s/%02d.png", path, hour)
+	apiKey := os.Getenv("METOFFICE_DATAHUB_API_KEY")
+	if apiKey == "" {
+		return errors.New("environment variable METOFFICE_DATAHUB_API_KEY not set")
+	}
 
-		if _, err := os.Stat(filename); err == nil {
-			// File already exists, skip.
-			continue
-		} else if !os.IsNotExist(err) {
-			// An unexpected error occurred (e.g., permissions).
-			return err
-		}
+	orderId := os.Getenv("METOFFICE_ORDER_ID")
+	if orderId == "" {
+		return errors.New("environment variable METOFFICE_ORDER_ID not set")
+	}
 
-		params := internal.NewQueryParams("dataSpec", "1.1.0")
-		if kind == "cloud_amount_total" {
-			params.Add("styleName", "iso_fill_bu_gn_30_100_pc")
-		}
-		inFile, err := client.GetLatestDataFile(resp.OrderDetails.Order.OrderId, file.FileId, params)
-		if err != nil {
-			return fmt.Errorf("failed to retrieve datafile %s for order %s: %w", file.FileId, orderId, err)
-		}
-		defer func() {
-			if err := inFile.Close(); err != nil {
-				// Log the error, but don't return it as it might mask a more important error
-				fmt.Fprintf(os.Stderr, "warning: failed to close input file %s: %v\n", file.FileId, err)
+	client := internal.NewDataHubClient(apiKey)
+	resp, err := client.GetLatest(orderId, internal.NewQueryParams("dataSpec", "1.1.0"))
+	if err != nil {
+		return fmt.Errorf("failed to retrieve order %s: %w", orderId, err)
+	}
+
+	log.Printf("Order %s contains %d files", orderId, len(resp.OrderDetails.Files))
+
+	if len(resp.OrderDetails.Files) == 0 {
+		log.Printf("No files to download")
+		return nil
+	}
+
+	log.Printf("Starting downloading files with pool size: %d", poolSize)
+
+	// Use metoffice.File for jobs
+	jobs := make(chan metoffice.File)
+	results := make(chan error)
+
+	// Worker function
+	worker := func() {
+		for file := range jobs {
+			matches := fileIdRegex.FindStringSubmatch(file.FileId)
+			if matches == nil {
+				results <- nil
+				continue
 			}
-		}()
 
-		tmpFile, err := os.CreateTemp(path, "download-*.tmp")
-		if err != nil {
-			return fmt.Errorf("failed to create temporary file: %w", err)
-		}
-		defer func() {
-			_ = tmpFile.Close()
-			_ = os.Remove(tmpFile.Name())
-		}()
+			path, err := createPath(rootDir, matches)
+			if err != nil {
+				results <- fmt.Errorf("failed to create path: %w", err)
+				continue
+			}
 
-		pipeline := pipelines[kind]
-		if pipeline == nil {
-			return fmt.Errorf("no processing pipeline defined for data type %s", kind)
-		}
+			hour, err := strconv.Atoi(matches[2])
+			if err != nil {
+				results <- fmt.Errorf("failed to convert %s to integer: %w", matches[2], err)
+				continue
+			}
 
-		img, err := png.NewPngFromReader(inFile)
-		if err != nil {
-			return fmt.Errorf("failed to decode PNG from data file: %w", err)
-		}
+			kind := matches[1]
+			filename := fmt.Sprintf("%s/%02d.png", path, hour)
 
-		if err := img.Pipeline(pipeline...); err != nil {
-			return fmt.Errorf("failed to process image pipeline: %w", err)
-		}
+			if _, err := os.Stat(filename); err == nil {
+				// File already exists, skip.
+				results <- nil
+				continue
+			} else if !os.IsNotExist(err) {
+				// An unexpected error occurred (e.g., permissions).
+				results <- err
+				continue
+			}
 
-		if err := img.Write(tmpFile); err != nil {
-			return fmt.Errorf("failed to write processed image to temporary file: %w", err)
-		}
+			params := internal.NewQueryParams("dataSpec", "1.1.0")
+			if kind == "cloud_amount_total" {
+				params.Add("styleName", "iso_fill_bu_gn_30_100_pc")
+			}
+			inFile, err := client.GetLatestDataFile(resp.OrderDetails.Order.OrderId, file.FileId, params)
+			if err != nil {
+				results <- fmt.Errorf("failed to retrieve datafile %s for order %s: %w", file.FileId, orderId, err)
+				continue
+			}
 
-		// Close tmpFile before renaming to ensure all data is flushed
-		if err := tmpFile.Close(); err != nil {
-			return fmt.Errorf("failed to close temporary file before rename: %w", err)
-		}
+			tmpFile, err := os.CreateTemp(path, "download-*.tmp")
+			if err != nil {
+				_ = inFile.Close()
+				results <- fmt.Errorf("failed to create temporary file: %w", err)
+				continue
+			}
 
-		if err := os.Rename(tmpFile.Name(), filename); err != nil {
-			return fmt.Errorf("failed to rename temporary file: %w", err)
+			pipeline := pipelines[kind]
+			if pipeline == nil {
+				_ = inFile.Close()
+				_ = tmpFile.Close()
+				_ = os.Remove(tmpFile.Name())
+				results <- fmt.Errorf("no processing pipeline defined for data type %s", kind)
+				continue
+			}
+
+			img, err := png.NewPngFromReader(inFile)
+			if err != nil {
+				_ = inFile.Close()
+				_ = tmpFile.Close()
+				_ = os.Remove(tmpFile.Name())
+				results <- fmt.Errorf("failed to decode PNG from data file: %w", err)
+				continue
+			}
+
+			if err := img.Pipeline(pipeline...); err != nil {
+				_ = inFile.Close()
+				_ = tmpFile.Close()
+				_ = os.Remove(tmpFile.Name())
+				results <- fmt.Errorf("failed to process image pipeline: %w", err)
+				continue
+			}
+
+			if err := img.Write(tmpFile); err != nil {
+				_ = inFile.Close()
+				_ = tmpFile.Close()
+				_ = os.Remove(tmpFile.Name())
+				results <- fmt.Errorf("failed to write processed image to temporary file: %w", err)
+				continue
+			}
+
+			if err := tmpFile.Close(); err != nil {
+				_ = inFile.Close()
+				_ = os.Remove(tmpFile.Name())
+				results <- fmt.Errorf("failed to close temporary file before rename: %w", err)
+				continue
+			}
+
+			if err := os.Rename(tmpFile.Name(), filename); err != nil {
+				_ = inFile.Close()
+				_ = os.Remove(tmpFile.Name())
+				results <- fmt.Errorf("failed to rename temporary file: %w", err)
+				continue
+			}
+
+			_ = inFile.Close()
+			results <- nil
 		}
-		// If rename is successful, cancel the deferred removal of the temporary file
-		// by re-deferring a no-op or setting a flag. For simplicity, we'll just let the defer run
-		// and handle the error if the file is already gone (which it will be).
-		// A more robust solution would involve a flag or a custom defer stack.
-		// For now, the os.Remove will just fail silently if the file is already gone.
-		// This is acceptable for a temporary file that has been renamed.
+	}
+
+	// Start workers
+	for range poolSize {
+		go worker()
+	}
+
+	// Send jobs
+	go func() {
+		for _, file := range resp.OrderDetails.Files {
+			jobs <- file
+		}
+		close(jobs)
+	}()
+
+	// Wait for all results
+	var firstErr error
+	for i := 0; i < len(resp.OrderDetails.Files); i++ {
+		err := <-results
+		if err != nil && firstErr == nil {
+			firstErr = err
+		}
+	}
+	if firstErr != nil {
+		return firstErr
 	}
 
 	return nil
