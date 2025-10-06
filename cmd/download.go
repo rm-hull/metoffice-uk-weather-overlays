@@ -41,12 +41,12 @@ func init() {
 }
 
 func createPath(rootDir string, matches []string) (string, error) {
-	path := fmt.Sprintf("%s/%s/%s/%s/%s", rootDir,
-		matches[1], // type
-		matches[3], // year
-		matches[4], // month
-		matches[5], // day
-	)
+    path := filepath.Join(rootDir,
+        matches[1], // type
+        matches[3], // year
+        matches[4], // month
+        matches[5], // day
+    )
 	if err := os.MkdirAll(path, 0755); err != nil {
 		return "", err
 	}
