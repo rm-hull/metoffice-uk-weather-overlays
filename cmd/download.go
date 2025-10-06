@@ -10,6 +10,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"strconv"
+	"time"
 
 	"github.com/rm-hull/godx"
 	"github.com/rm-hull/metoffice-uk-weather-overlays/internal"
@@ -38,17 +39,16 @@ func Download(rootDir string, poolSize int) error {
 		return err
 	}
 
-	log.Printf("Starting downloading files with pool size: %d", poolSize)
+	log.Printf("Starting downloading files with pool size: %d", downloader.poolSize)
 
 	downloader.startWorkers()
 	downloader.dispatchJobs()
-	if err := downloader.Wait(); err != nil {
-		return err
-	}
-	return nil
+	return downloader.Wait()
 }
 
 type Processor struct {
+	startTime   time.Time
+	endTime     time.Time
 	rootDir     string
 	poolSize    int
 	jobs        chan metoffice.File
@@ -61,6 +61,7 @@ type Processor struct {
 }
 
 func NewDownloader(rootDir string, poolSize int, apiKey, orderId string) (*Processor, error) {
+	startTime := time.Now()
 	orderId = url.QueryEscape(orderId)
 	client := internal.NewDataHubClient(apiKey)
 	resp, err := client.GetLatest(orderId, internal.NewQueryParams("dataSpec", "1.1.0"))
@@ -74,6 +75,7 @@ func NewDownloader(rootDir string, poolSize int, apiKey, orderId string) (*Proce
 	}
 
 	return &Processor{
+		startTime:   startTime,
 		rootDir:     rootDir,
 		poolSize:    poolSize,
 		jobs:        make(chan metoffice.File),
@@ -212,6 +214,11 @@ func (p *Processor) Wait() error {
 		if err != nil && firstErr == nil {
 			firstErr = err
 		}
+	}
+	p.endTime = time.Now()
+	if firstErr == nil {
+		elapsed := p.endTime.Sub(p.startTime)
+		log.Printf("All files downloaded and processed in %s", elapsed)
 	}
 	return firstErr
 }
