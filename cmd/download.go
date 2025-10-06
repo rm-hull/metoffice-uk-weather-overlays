@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"image/color"
-	"io"
 	"os"
 	"regexp"
 	"strconv"
@@ -12,6 +11,7 @@ import (
 	"github.com/rm-hull/godx"
 	"github.com/rm-hull/metoffice-uk-weather-overlays/internal"
 	"github.com/rm-hull/metoffice-uk-weather-overlays/internal/png"
+	"github.com/rm-hull/metoffice-uk-weather-overlays/internal/png/stage"
 )
 
 func Download(rootDir string) error {
@@ -47,6 +47,23 @@ func Download(rootDir string) error {
 			return "", err
 		}
 		return path, nil
+	}
+
+	pipelines := map[string][]png.PipelineStage{
+		"total_precipitation_rate": {
+			&stage.ReplaceColorStage{Tolerance: 50, Replace: color.White},
+			&stage.GaussianBlurStage{Sigma: 1.0},
+			&stage.ResampleStage{},
+		},
+		"cloud_amount_total": {
+			&stage.ReplaceColorStage{Tolerance: 250, Replace: color.NRGBA{R: 0, G: 0xff, B: 0, A: 0xff}},
+			&stage.GreyscaleStage{},
+			&stage.GaussianBlurStage{Sigma: 1.0},
+			&stage.ResampleStage{},
+		},
+		// NoOp's
+		"mean_sea_level_pressure": {},
+		"temperature_at_surface":  {},
 	}
 
 	for _, file := range resp.OrderDetails.Files {
@@ -100,18 +117,22 @@ func Download(rootDir string) error {
 			_ = os.Remove(tmpFile.Name())
 		}()
 
-		var processingErr error
-		switch kind {
-		case "total_precipitation_rate":
-			processingErr = png.Smooth(inFile, tmpFile, 50, 1.0, color.White, false)
-		case "cloud_amount_total":
-			processingErr = png.Smooth(inFile, tmpFile, 250, 1.0, color.NRGBA{R: 0, G: 0xff, B: 0, A: 0xff}, true)
-		default:
-			_, processingErr = io.Copy(tmpFile, inFile)
+		pipeline := pipelines[kind]
+		if pipeline == nil {
+			return fmt.Errorf("no processing pipeline defined for data type %s", kind)
 		}
 
-		if processingErr != nil {
-			return fmt.Errorf("failed to process data file: %w", processingErr)
+		img, err := png.NewPngFromReader(inFile)
+		if err != nil {
+			return fmt.Errorf("failed to decode PNG from data file: %w", err)
+		}
+
+		if err := img.Pipeline(pipeline...); err != nil {
+			return fmt.Errorf("failed to process image pipeline: %w", err)
+		}
+
+		if err := img.Write(tmpFile); err != nil {
+			return fmt.Errorf("failed to write processed image to temporary file: %w", err)
 		}
 
 		// Close tmpFile before renaming to ensure all data is flushed
