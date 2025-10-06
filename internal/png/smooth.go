@@ -13,7 +13,7 @@ import (
 
 // adjust tolerance: higher means more aggressive removal
 // adjust sigma: tweak for more/less blur
-func Smooth(r io.Reader, w io.Writer, tolerance float64, sigma float64, replace color.Color) error {
+func Smooth(r io.Reader, w io.Writer, tolerance float64, sigma float64, replace color.Color, greyscale bool) error {
 
 	img, err := png.Decode(r)
 	if err != nil {
@@ -45,8 +45,28 @@ func Smooth(r io.Reader, w io.Writer, tolerance float64, sigma float64, replace 
 		}
 	}
 
-	// Apply Gaussian blur to the whole RGBA image
-	blurred := blur.Gaussian(out, sigma)
+	// If greyscale is true, convert to greyscale before blur
+	var imgForBlur image.Image = out
+	if greyscale {
+		gs := image.NewNRGBA(bounds)
+		for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
+			for x := bounds.Min.X; x < bounds.Max.X; x++ {
+				r, g, b, a := out.At(x, y).RGBA()
+				if a == 0 {
+					gs.Set(x, y, color.NRGBA{0, 0, 0, 0})
+					continue
+				}
+				// Calculate luminance using standard formula
+				lum := uint8(0.299*float64(r>>8) + 0.587*float64(g>>8) + 0.114*float64(b>>8))
+				// gs.Set(x, y, color.NRGBA{lum, lum, lum, uint8(a >> 8)})
+				gs.Set(x, y, color.NRGBA{255, 255, 255, lum})
+			}
+		}
+		imgForBlur = gs
+	}
+
+	// Apply Gaussian blur to the (possibly greyscale) image
+	blurred := blur.Gaussian(imgForBlur, sigma)
 
 	// Now smooth edges with bicubic-like resampling
 	smoothed := image.NewNRGBA(bounds)

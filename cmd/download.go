@@ -103,9 +103,9 @@ func Download(rootDir string) error {
 		var processingErr error
 		switch kind {
 		case "total_precipitation_rate":
-			processingErr = png.Smooth(inFile, tmpFile, 50, 1.0, color.White)
+			processingErr = png.Smooth(inFile, tmpFile, 50, 1.0, color.White, false)
 		case "cloud_amount_total":
-			processingErr = png.Smooth(inFile, tmpFile, 250, 1.0, color.NRGBA{R: 0, G: 0xff, B: 0, A: 0xff})
+			processingErr = png.Smooth(inFile, tmpFile, 250, 1.0, color.NRGBA{R: 0, G: 0xff, B: 0, A: 0xff}, true)
 		default:
 			_, processingErr = io.Copy(tmpFile, inFile)
 		}
