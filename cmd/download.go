@@ -6,6 +6,7 @@ import (
 	"image/color"
 	"log"
 	"os"
+	"path/filepath"
 	"regexp"
 	"strconv"
 
