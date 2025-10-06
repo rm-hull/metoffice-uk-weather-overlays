@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/dustin/go-humanize"
 	metoffice "github.com/rm-hull/metoffice-uk-weather-overlays/internal/models/met_office"
 )
 
@@ -57,7 +58,6 @@ func (mgr *DataHubManager) GetLatestDataFile(orderId, fileId string, params Quer
 }
 
 func (mgr *DataHubManager) get(url string, acceptHeader string) (io.ReadCloser, error) {
-	log.Printf("Retrieving: %s", url)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, fmt.Errorf("failed to create request: %w", err)
@@ -65,16 +65,27 @@ func (mgr *DataHubManager) get(url string, acceptHeader string) (io.ReadCloser, 
 	req.Header.Set("apikey", mgr.apiKey)
 	req.Header.Set("Accept", acceptHeader)
 
-	res, err := mgr.client.Do(req)
+	resp, err := mgr.client.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to fetch from %s: %w", url, err)
 	}
 
-	if res.StatusCode > 299 {
-		_ = res.Body.Close()
-		return nil, fmt.Errorf("http status response from %s: %s", url, res.Status)
+	if resp.StatusCode > 299 {
+		_ = resp.Body.Close()
+		return nil, fmt.Errorf("http status response from %s: %s", url, resp.Status)
 	}
-	return res.Body, nil
+
+	filesize := "unknown size"
+	if resp.ContentLength >= 0 {
+		filesize = humanize.Bytes(uint64(resp.ContentLength))
+	}
+	
+	lastModified := resp.Header.Get("Last-Modified")
+	if lastModified == "" {
+		lastModified = "unknown"
+	}
+	log.Printf("Retrieving: %s (%s, last modified: %s) ", url, filesize, lastModified)
+	return resp.Body, nil
 }
 
 type QueryParams map[string]string
