@@ -89,8 +89,8 @@ func NewQueryParams(keypairs ...string) QueryParams {
 	return params
 }
 
-func (q *QueryParams) Add(s string, param2 string) {
-	(*q)[s] = param2
+func (q *QueryParams) Add(key string, value string) {
+	(*q)[key] = value
 }
 
 func (q *QueryParams) toString() string {
