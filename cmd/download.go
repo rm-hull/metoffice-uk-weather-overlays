@@ -41,6 +41,7 @@ func Download(rootDir string, poolSize int) error {
 
 	log.Printf("Starting downloading files with pool size: %d", downloader.poolSize)
 
+	downloader.maxJobs = 308
 	downloader.startWorkers()
 	downloader.dispatchJobs()
 	return downloader.Wait()
@@ -51,6 +52,7 @@ type Processor struct {
 	endTime     time.Time
 	rootDir     string
 	poolSize    int
+	maxJobs     int
 	jobs        chan metoffice.File
 	results     chan error
 	client      internal.DataHubClient
@@ -81,6 +83,7 @@ func NewDownloader(rootDir string, poolSize int, apiKey, orderId string) (*Proce
 		startTime:   startTime,
 		rootDir:     rootDir,
 		poolSize:    poolSize,
+		maxJobs:     -1,
 		jobs:        make(chan metoffice.File),
 		results:     make(chan error),
 		client:      client,
@@ -94,7 +97,7 @@ func NewDownloader(rootDir string, poolSize int, apiKey, orderId string) (*Proce
 				&stage.ResampleStage{},
 			},
 			"cloud_amount_total": {
-				&stage.ReplaceColorStage{Tolerance: 250, Replace: color.NRGBA{R: 0, G: 0xff, B: 0, A: 0xff}},
+				&stage.ReplaceColorStage{Tolerance: 50, Replace: color.White},
 				&stage.GreyscaleStage{},
 				&stage.GaussianBlurStage{Sigma: 1.0},
 				&stage.ResampleStage{},
@@ -106,9 +109,15 @@ func NewDownloader(rootDir string, poolSize int, apiKey, orderId string) (*Proce
 	}, nil
 }
 
+// dispatchJobs sends files to the jobs channel for processing by workers.
+// When maxJobs is greater than zero, it limits the number of jobs dispatched,
+// hence set to -1 to dispatch all jobs.
 func (p *Processor) dispatchJobs() {
 	go func() {
-		for _, file := range p.files {
+		for n, file := range p.files {
+			if p.maxJobs > 0 && n >= p.maxJobs {
+				break
+			}
 			p.jobs <- file
 		}
 		close(p.jobs)
@@ -208,11 +217,18 @@ func (p *Processor) worker(i int) {
 		_ = inFile.Close()
 		p.results <- nil
 	}
+	log.Printf("Worker %d finished", i)
 }
 
 func (p *Processor) Wait() error {
+	waitFor := p.maxJobs
+	if waitFor < 0 {
+		waitFor = len(p.files)
+	}
+	log.Printf("Waiting for %d files to be downloaded and processed", waitFor)
+
 	var firstErr error
-	for range p.files {
+	for range waitFor {
 		err := <-p.results
 		if err != nil && firstErr == nil {
 			firstErr = err
