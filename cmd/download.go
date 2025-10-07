@@ -165,6 +165,7 @@ func (p *Processor) processFile(file metoffice.File) error {
 	kind := matches[1]
 	filename := fmt.Sprintf("%s/%02d.png", path, hour)
 
+	// if the file already exists, skip processing
 	if _, err := os.Stat(filename); err == nil {
 		return nil
 	} else if !os.IsNotExist(err) {
