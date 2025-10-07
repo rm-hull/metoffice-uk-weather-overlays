@@ -70,6 +70,11 @@ func (mgr *DataHubManager) get(url string, acceptHeader string) (io.ReadCloser, 
 		return nil, fmt.Errorf("failed to fetch from %s: %w", url, err)
 	}
 
+  if resp.StatusCode == 429 {
+		_ = resp.Body.Close()
+		return nil, fmt.Errorf("rate limit exceeded when accessing %s: %s -- retry-after: %s", url, resp.Status, resp.Header.Get("Retry-After"))
+	}
+  
 	if resp.StatusCode > 299 {
 		_ = resp.Body.Close()
 		return nil, fmt.Errorf("http status response from %s: %s", url, resp.Status)

@@ -13,6 +13,7 @@ func main() {
 	var rootPath string
 	var port int
 	var debug bool
+	var poolSize int
 
 	if err := godotenv.Load(); err != nil {
 		log.Println("No .env file found")
@@ -38,11 +39,12 @@ func main() {
 		Use:   "download",
 		Short: "Initiate download",
 		Run: func(_ *cobra.Command, _ []string) {
-			if err := cmd.Download(rootPath); err != nil {
+			if err := cmd.Download(rootPath, poolSize); err != nil {
 				log.Fatalf("failed to download: %v", err)
 			}
 		},
 	}
+	downloadCmd.Flags().IntVar(&poolSize, "pool-size", 4, "Number of parallel downloads")
 
 	rootCmd.PersistentFlags().StringVar(&rootPath, "root", "./data/datahub", "Path to root folder")
 	rootCmd.AddCommand(apiServerCmd)

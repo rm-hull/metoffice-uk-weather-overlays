@@ -18,7 +18,7 @@
             "request": "launch",
             "mode": "auto",
             "program": "main.go",
-            "args": ["download"]
+            "args": ["download", "--pool-size", "10"]
         }
     ]
 }
