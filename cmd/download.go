@@ -141,91 +141,89 @@ func (p *Processor) startWorkers() {
 func (p *Processor) worker(i int) {
 	log.Printf("Worker %d started", i)
 	for file := range p.jobs {
-		matches := p.fileIdRegex.FindStringSubmatch(file.FileId)
-		if matches == nil {
-			p.results <- nil
-			continue
-		}
-		path, err := p.createPath(matches)
-		if err != nil {
-			p.results <- fmt.Errorf("failed to create path: %w", err)
-			continue
-		}
-		hour, err := strconv.Atoi(matches[2])
-		if err != nil {
-			p.results <- fmt.Errorf("failed to convert %s to integer: %w", matches[2], err)
-			continue
-		}
-		kind := matches[1]
-		filename := fmt.Sprintf("%s/%02d.png", path, hour)
-		if _, err := os.Stat(filename); err == nil {
-			p.results <- nil
-			continue
-		} else if !os.IsNotExist(err) {
-			p.results <- err
-			continue
-		}
-		params := internal.NewQueryParams("dataSpec", "1.1.0")
-		if kind == "cloud_amount_total" {
-			params.Add("styleName", "iso_fill_bu_gn_30_100_pc")
-		}
-		inFile, err := p.client.GetLatestDataFile(p.orderId, file.FileId, params)
-		if err != nil {
-			p.results <- fmt.Errorf("failed to retrieve datafile %s for order %s: %w", file.FileId, p.orderId, err)
-			continue
-		}
-		tmpFile, err := os.CreateTemp(path, "download-*.tmp")
-		if err != nil {
-			_ = inFile.Close()
-			p.results <- fmt.Errorf("failed to create temporary file: %w", err)
-			continue
-		}
-		pipeline := p.pipelines[kind]
-		if pipeline == nil {
-			_ = inFile.Close()
-			_ = tmpFile.Close()
-			_ = os.Remove(tmpFile.Name())
-			p.results <- fmt.Errorf("no processing pipeline defined for data type %s", kind)
-			continue
-		}
-		img, err := png.NewPngFromReader(inFile)
-		if err != nil {
-			_ = inFile.Close()
-			_ = tmpFile.Close()
-			_ = os.Remove(tmpFile.Name())
-			p.results <- fmt.Errorf("failed to decode PNG from data file: %w", err)
-			continue
-		}
-		if err := img.Pipeline(pipeline...); err != nil {
-			_ = inFile.Close()
-			_ = tmpFile.Close()
-			_ = os.Remove(tmpFile.Name())
-			p.results <- fmt.Errorf("failed to process image pipeline: %w", err)
-			continue
-		}
-		if err := img.Write(tmpFile); err != nil {
-			_ = inFile.Close()
-			_ = tmpFile.Close()
-			_ = os.Remove(tmpFile.Name())
-			p.results <- fmt.Errorf("failed to write processed image to temporary file: %w", err)
-			continue
-		}
-		if err := tmpFile.Close(); err != nil {
-			_ = inFile.Close()
-			_ = os.Remove(tmpFile.Name())
-			p.results <- fmt.Errorf("failed to close temporary file before rename: %w", err)
-			continue
-		}
-		if err := os.Rename(tmpFile.Name(), filename); err != nil {
-			_ = inFile.Close()
-			_ = os.Remove(tmpFile.Name())
-			p.results <- fmt.Errorf("failed to rename temporary file: %w", err)
-			continue
-		}
-		_ = inFile.Close()
-		p.results <- nil
+		p.results <- p.processFile(file)
 	}
 	log.Printf("Worker %d finished", i)
+}
+
+func (p *Processor) processFile(file metoffice.File) error {
+	matches := p.fileIdRegex.FindStringSubmatch(file.FileId)
+	if matches == nil {
+		return nil
+	}
+
+	path, err := p.createPath(matches)
+	if err != nil {
+		return fmt.Errorf("failed to create path: %w", err)
+	}
+
+	hour, err := strconv.Atoi(matches[2])
+	if err != nil {
+		return fmt.Errorf("failed to convert %s to integer: %w", matches[2], err)
+	}
+
+	kind := matches[1]
+	filename := fmt.Sprintf("%s/%02d.png", path, hour)
+
+	if _, err := os.Stat(filename); err == nil {
+		return nil
+	} else if !os.IsNotExist(err) {
+		return err
+	}
+
+	params := internal.NewQueryParams("dataSpec", "1.1.0")
+	if kind == "cloud_amount_total" {
+		params.Add("styleName", "iso_fill_bu_gn_30_100_pc")
+	}
+
+	inFile, err := p.client.GetLatestDataFile(p.orderId, file.FileId, params)
+	if err != nil {
+		return fmt.Errorf("failed to retrieve datafile %s for order %s: %w", file.FileId, p.orderId, err)
+	}
+	defer func() {
+		_ = inFile.Close()
+	}()
+
+	tmpFile, err := os.CreateTemp(path, "download-*.tmp")
+	if err != nil {
+		return fmt.Errorf("failed to create temporary file: %w", err)
+	}
+	cleanupTemp := true
+	defer func() {
+		_ = tmpFile.Close()
+		if cleanupTemp {
+			_ = os.Remove(tmpFile.Name())
+		}
+	}()
+
+	pipeline := p.pipelines[kind]
+	if pipeline == nil {
+		return fmt.Errorf("no processing pipeline defined for data type %s", kind)
+	}
+
+	img, err := png.NewPngFromReader(inFile)
+	if err != nil {
+		return fmt.Errorf("failed to decode PNG from data file: %w", err)
+	}
+
+	if err := img.Pipeline(pipeline...); err != nil {
+		return fmt.Errorf("failed to process image pipeline: %w", err)
+	}
+
+	if err := img.Write(tmpFile); err != nil {
+		return fmt.Errorf("failed to write processed image to temporary file: %w", err)
+	}
+
+	if err := tmpFile.Close(); err != nil {
+		return fmt.Errorf("failed to close temporary file before rename: %w", err)
+	}
+
+	if err := os.Rename(tmpFile.Name(), filename); err != nil {
+		return fmt.Errorf("failed to rename temporary file: %w", err)
+	}
+
+	cleanupTemp = false // Successfully renamed, don't delete
+	return nil
 }
 
 func (p *Processor) Wait() []error {
