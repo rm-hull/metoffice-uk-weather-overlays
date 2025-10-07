@@ -41,10 +41,18 @@ func Download(rootDir string, poolSize int) error {
 
 	log.Printf("Starting downloading files with pool size: %d", downloader.poolSize)
 
-	downloader.maxJobs = 308
 	downloader.startWorkers()
 	downloader.dispatchJobs()
-	return downloader.Wait()
+	errors := downloader.Wait()
+
+	if len(errors) > 0 {
+		for _, err := range errors {
+			log.Printf("Error: %v", err)
+		}
+		return fmt.Errorf("%d error(s) occurred", len(errors))
+	}
+
+	return nil
 }
 
 type Processor struct {
@@ -220,26 +228,24 @@ func (p *Processor) worker(i int) {
 	log.Printf("Worker %d finished", i)
 }
 
-func (p *Processor) Wait() error {
+func (p *Processor) Wait() []error {
 	waitFor := p.maxJobs
 	if waitFor < 0 {
 		waitFor = len(p.files)
 	}
 	log.Printf("Waiting for %d files to be downloaded and processed", waitFor)
 
-	var firstErr error
+	errors := make([]error, 0, 10)
 	for range waitFor {
 		err := <-p.results
-		if err != nil && firstErr == nil {
-			firstErr = err
+		if err != nil {
+			errors = append(errors, err)
 		}
 	}
 	p.endTime = time.Now()
-	if firstErr == nil {
-		elapsed := p.endTime.Sub(p.startTime)
-		log.Printf("All files downloaded and processed in %s", elapsed)
-	}
-	return firstErr
+	elapsed := p.endTime.Sub(p.startTime)
+	log.Printf("All files downloaded and processed in %s (errors=%d)", elapsed, len(errors))
+	return errors
 }
 
 func (p *Processor) createPath(matches []string) (string, error) {
