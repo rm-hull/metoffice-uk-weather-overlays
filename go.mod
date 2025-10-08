@@ -51,7 +51,7 @@ require (
 )
 
 require (
-	github.com/Depado/ginprom v1.8.1
+	github.com/Depado/ginprom v1.8.2
 	github.com/bytedance/gopkg v0.1.3 // indirect
 	github.com/bytedance/sonic v1.14.1 // indirect
 	github.com/bytedance/sonic/loader v0.3.0 // indirect
