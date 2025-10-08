@@ -18,7 +18,9 @@ import (
 	hc_config "github.com/tavsec/gin-healthcheck/config"
 )
 
-const STATIC_PATH_PREFIX = "/v1/metoffice/datahub/"
+const staticPathPrefix = "/v1/metoffice/datahub/"
+
+var forecastPathRegexp = regexp.MustCompile(`^([^/]+)/(\d{4}/\d{2}/\d{2})/(\d{2})\.png$`)
 
 // ApiServer starts an HTTP server to serve static files from rootDir on the given port.
 // If debug is true, pprof endpoints are enabled.
@@ -51,12 +53,12 @@ func ApiServer(rootDir string, port int, debug bool) {
 		log.Fatalf("failed to initialize healthcheck: %v", err)
 	}
 
-	r.Static(STATIC_PATH_PREFIX, rootDir)
+	r.Static(staticPathPrefix, rootDir)
 
 	// Global 404 handler for unmatched routes (including static file misses)
 	r.NoRoute(func(c *gin.Context) {
 
-		if strings.HasPrefix(c.Request.URL.Path, STATIC_PATH_PREFIX) {
+		if strings.HasPrefix(c.Request.URL.Path, staticPathPrefix) {
 			err := tryPreviousDaysForecast(c)
 			if err == nil {
 				return
@@ -85,9 +87,8 @@ func ApiServer(rootDir string, port int, debug bool) {
 func tryPreviousDaysForecast(c *gin.Context) error {
 	// Use regex to extract overlay, year, month, day, hour
 	// Example path: /v1/metoffice/datahub/cloud_amount_total/2023/10/15/20.png
-	trimmedPath := strings.TrimPrefix(c.Request.URL.Path, STATIC_PATH_PREFIX)
-	var re = regexp.MustCompile(`^([^/]+)/(\d{4}/\d{2}/\d{2})/(\d{2}).png$`)
-	matches := re.FindStringSubmatch(trimmedPath)
+	trimmedPath := strings.TrimPrefix(c.Request.URL.Path, staticPathPrefix)
+	matches := forecastPathRegexp.FindStringSubmatch(trimmedPath)
 	if len(matches) != 4 {
 		return fmt.Errorf("URL path does not match expected format: %s", trimmedPath)
 	}
@@ -107,12 +108,12 @@ func tryPreviousDaysForecast(c *gin.Context) error {
 	prevDay := dt.AddDate(0, 0, -1).Format("2006/01/02")
 	prevHour := hour + 24
 
-	if prevHour < 0 || prevHour > 72 {
+	if prevHour > 72 {
 		return fmt.Errorf("calculated hour %d is out of range (0-72)", prevHour)
 	}
 
 	// Construct new URL and redirect
-	newURL := fmt.Sprintf("%s%s/%s/%02d.png", STATIC_PATH_PREFIX, overlay, prevDay, prevHour)
+	newURL := fmt.Sprintf("%s%s/%s/%02d.png", staticPathPrefix, overlay, prevDay, prevHour)
 	c.Redirect(http.StatusTemporaryRedirect, newURL)
 	return nil
 }
