@@ -54,7 +54,7 @@ go run main.go download
 
 **Options:**
 *   `--root <path>`: Specifies the root directory where data will be stored. Defaults to `./data/datahub`.
-*   `--pool-size <count>`: Sets the number of concurrent download workers. Defaults to `4`.
+*   `--pool-size <num>`: Sets the number of concurrent download workers. Defaults to `4`.
 
 **Example:**
 ```bash
