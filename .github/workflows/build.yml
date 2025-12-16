@@ -20,7 +20,7 @@ jobs:
       checks: write
 
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v6
 
       - name: Setup Go
         uses: actions/setup-go@v6
@@ -28,7 +28,7 @@ jobs:
           go-version: "1.25"
 
       - name: Cache Go modules & tools
-        uses: actions/cache@v4
+        uses: actions/cache@v5
         with:
           path: |
             ~/.cache/go-build
@@ -47,13 +47,13 @@ jobs:
 
       - name: Collect test results
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v6
         with:
           name: test-reports
           path: ./test-reports/
 
       - name: Publish test results
-        uses: mikepenz/action-junit-report@v5
+        uses: mikepenz/action-junit-report@v6
         if: always()
         with:
           report_paths: "./test-reports/junit.xml"
@@ -68,7 +68,7 @@ jobs:
           path-to-profile: profile.cov
 
       - name: Lint
-        uses: golangci/golangci-lint-action@v8
+        uses: golangci/golangci-lint-action@v9
 
   docker-publish:
     concurrency:
@@ -83,7 +83,7 @@ jobs:
 
     steps:
       - name: Checkout repository with full history
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3

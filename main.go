@@ -36,7 +36,7 @@ func main() {
 	apiServerCmd.Flags().BoolVar(&debug, "debug", false, "Enable debugging (pprof) - WARING: do not enable in production")
 
 	downloadCmd := &cobra.Command{
-		Use:   "download",
+		Use:   "download [--pool-size <num>]",
 		Short: "Initiate download",
 		Run: func(_ *cobra.Command, _ []string) {
 			if err := cmd.Download(rootPath, poolSize); err != nil {
