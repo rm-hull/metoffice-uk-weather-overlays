@@ -13,7 +13,6 @@ RUN go mod download
 
 COPY . .
 
-ENV CGO_ENABLED=1
 ENV GOOS=linux
 
 RUN go build -tags=jsoniter -ldflags="-w -s" -o uk-weather-overlays .
