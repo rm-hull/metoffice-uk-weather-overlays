@@ -17,6 +17,7 @@ func StartCron(rootDir, apiKey, orderId string) (*cron.Cron, error) {
 		downloader, err := NewDownloader(rootDir, poolSize, apiKey, orderId)
 		if err != nil {
 			log.Printf("Failed to create downloader: %v", err)
+			return
 		}
 
 		downloader.StartWorkers()
