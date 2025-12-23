@@ -27,8 +27,8 @@ func main() {
 	apiServerCmd := &cobra.Command{
 		Use:   "api-server [--port <port>] [--debug]",
 		Short: "Start HTTP API server",
-		Run: func(_ *cobra.Command, _ []string) {
-			cmd.ApiServer(rootPath, port, debug)
+		RunE: func(_ *cobra.Command, _ []string) error {
+			return cmd.ApiServer(rootPath, port, debug)
 		},
 	}
 
