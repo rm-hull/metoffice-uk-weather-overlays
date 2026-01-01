@@ -55,6 +55,7 @@ require (
 	github.com/bytedance/sonic v1.14.2 // indirect
 	github.com/bytedance/sonic/loader v0.4.0 // indirect
 	github.com/cloudwego/base64x v0.1.6 // indirect
+	github.com/dustin/go-humanize v1.0.1
 	github.com/earthboundkid/versioninfo/v2 v2.24.1 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.12 // indirect
 	github.com/gin-contrib/pprof v1.5.3
