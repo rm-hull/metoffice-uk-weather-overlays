@@ -1,6 +1,6 @@
 module github.com/rm-hull/metoffice-uk-weather-overlays
 
-go 1.25.1
+go 1.26
 
 require (
 	github.com/anthonynsimon/bild v0.14.0
