@@ -5,7 +5,7 @@ import (
 	"image/color"
 	"math"
 
-	"github.com/rm-hull/metoffice-uk-weather-overlays/internal/png"
+	"github.com/rm-hull/metoffice-uk-weather-overlays/internal/imageprocessing"
 )
 
 type ReplaceColorStage struct {
@@ -16,12 +16,13 @@ type ReplaceColorStage struct {
 // Process replaces pixels close to the specified color with transparency based on the distance to that color
 // Tolerance defines how close a pixel must be to the target color to be affected
 // A pixel exactly matching the target color becomes fully transparent, one at the edge of the tolerance remains opaque
-func (s *ReplaceColorStage) Process(p *png.PngImage) error {
-	out := image.NewNRGBA(p.Bounds)
+func (s *ReplaceColorStage) Process(p *imageprocessing.PngImage) error {
+	bounds := p.Img.Bounds()
+	out := image.NewNRGBA(bounds)
 	replaceR, replaceG, replaceB, _ := s.Replace.RGBA()
 	rR, rG, rB := float64(replaceR>>8), float64(replaceG>>8), float64(replaceB>>8)
-	for y := p.Bounds.Min.Y; y < p.Bounds.Max.Y; y++ {
-		for x := p.Bounds.Min.X; x < p.Bounds.Max.X; x++ {
+	for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
+		for x := bounds.Min.X; x < bounds.Max.X; x++ {
 			r, g, b, a := p.Img.At(x, y).RGBA()
 			R, G, B, A := float64(r>>8), float64(g>>8), float64(b>>8), float64(a>>8)
 			dist := math.Sqrt((rR-R)*(rR-R) + (rG-G)*(rG-G) + (rB-B)*(rB-B))

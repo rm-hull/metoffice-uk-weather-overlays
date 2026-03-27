@@ -4,7 +4,7 @@ import (
 	"image"
 	"image/color"
 
-	"github.com/rm-hull/metoffice-uk-weather-overlays/internal/png"
+	"github.com/rm-hull/metoffice-uk-weather-overlays/internal/imageprocessing"
 )
 
 type GreyscaleStage struct{}
@@ -12,10 +12,11 @@ type GreyscaleStage struct{}
 // Process converts the image to greyscale using luminance calculation
 // The alpha channel is set based on the luminance value, with higher luminance resulting in higher opacity
 // Fully transparent pixels remain transparent
-func (s *GreyscaleStage) Process(p *png.PngImage) error {
-	gs := image.NewNRGBA(p.Bounds)
-	for y := p.Bounds.Min.Y; y < p.Bounds.Max.Y; y++ {
-		for x := p.Bounds.Min.X; x < p.Bounds.Max.X; x++ {
+func (s *GreyscaleStage) Process(p *imageprocessing.PngImage) error {
+	bounds := p.Img.Bounds()
+	gs := image.NewNRGBA(bounds)
+	for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
+		for x := bounds.Min.X; x < bounds.Max.X; x++ {
 			r, g, b, a := p.Img.At(x, y).RGBA()
 			if a == 0 {
 				gs.Set(x, y, color.NRGBA{0, 0, 0, 0})

@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/rm-hull/metoffice-uk-weather-overlays/internal/png"
+	imageprocessing "github.com/rm-hull/metoffice-uk-weather-overlays/internal/image_processing"
 )
 
 func CreateAnimation() {
@@ -22,7 +22,7 @@ func CreateAnimation() {
 		files[i] = dirPath + entry.Name()
 	}
 
-	apngBytes, err := png.Animate(files, 1.0)
+	apngBytes, err := imageprocessing.Animate(files, 1.0)
 	if err != nil {
 		log.Fatal(err)
 	}

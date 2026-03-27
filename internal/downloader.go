@@ -12,9 +12,9 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/rm-hull/metoffice-uk-weather-overlays/internal/imageprocessing"
+	"github.com/rm-hull/metoffice-uk-weather-overlays/internal/imageprocessing/stage"
 	metoffice "github.com/rm-hull/metoffice-uk-weather-overlays/internal/models/met_office"
-	"github.com/rm-hull/metoffice-uk-weather-overlays/internal/png"
-	"github.com/rm-hull/metoffice-uk-weather-overlays/internal/png/stage"
 )
 
 type Processor struct {
@@ -29,7 +29,7 @@ type Processor struct {
 	files       []metoffice.File
 	orderId     string
 	fileIdRegex *regexp.Regexp
-	pipelines   map[string][]png.PipelineStage
+	pipelines   map[string][]imageprocessing.PipelineStage
 }
 
 func NewDownloader(rootDir string, poolSize int, apiKey, orderId string) (*Processor, error) {
@@ -60,7 +60,7 @@ func NewDownloader(rootDir string, poolSize int, apiKey, orderId string) (*Proce
 		files:       resp.OrderDetails.Files,
 		orderId:     orderId,
 		fileIdRegex: regexp.MustCompile(`(.*?)_ts(\d{1,2})_(\d{4})(\d{2})(\d{2})00`),
-		pipelines: map[string][]png.PipelineStage{
+		pipelines: map[string][]imageprocessing.PipelineStage{
 			"total_precipitation_rate": {
 				&stage.ReplaceColorStage{Tolerance: 50, Replace: color.White},
 				&stage.GaussianBlurStage{Sigma: 1.0},
@@ -128,7 +128,7 @@ func (p *Processor) processFile(file metoffice.File) error {
 	}
 
 	kind := matches[1]
-	filename := fmt.Sprintf("%s/%02d.png", path, hour)
+	filename := fmt.Sprintf("%s/%02d.webp", path, hour)
 
 	// if the file already exists, skip processing
 	if _, err := os.Stat(filename); err == nil {
@@ -167,7 +167,7 @@ func (p *Processor) processFile(file metoffice.File) error {
 		return fmt.Errorf("no processing pipeline defined for data type %s", kind)
 	}
 
-	img, err := png.NewPngFromReader(inFile)
+	img, err := imageprocessing.NewImageFromReader(inFile)
 	if err != nil {
 		return fmt.Errorf("failed to decode PNG from data file: %w", err)
 	}

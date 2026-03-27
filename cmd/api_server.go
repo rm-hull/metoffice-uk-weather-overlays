@@ -23,7 +23,7 @@ import (
 
 const staticPathPrefix = "/v1/metoffice/datahub/"
 
-var forecastPathRegexp = regexp.MustCompile(`^([^/]+)/(\d{4}/\d{2}/\d{2})/(\d{2})\.png$`)
+var forecastPathRegexp = regexp.MustCompile(`^([^/]+)/(\d{4}/\d{2}/\d{2})/(\d{2})\.webp$`)
 
 // ApiServer starts an HTTP server to serve static files from rootDir on the given port.
 // If debug is true, pprof endpoints are enabled.
@@ -100,12 +100,12 @@ func ApiServer(rootDir string, port int, debug bool) error {
 
 // tryPreviousDaysForecast attempts to handle requests for missing forecast files
 // by redirecting to the previous day's forecast at the same hour + 24.
-// For example, a request for /v1/metoffice/datahub/cloud_amount_total/2023/10/15/20.png
-// would be redirected to /v1/metoffice/datahub/cloud_amount_total/2023/10/14/44.png
+// For example, a request for /v1/metoffice/datahub/cloud_amount_total/2023/10/15/20.webp
+// would be redirected to /v1/metoffice/datahub/cloud_amount_total/2023/10/14/44.webp
 // if the original file is not found.
 func tryPreviousDaysForecast(c *gin.Context) error {
 	// Use regex to extract overlay, year, month, day, hour
-	// Example path: /v1/metoffice/datahub/cloud_amount_total/2023/10/15/20.png
+	// Example path: /v1/metoffice/datahub/cloud_amount_total/2023/10/15/20.webp
 	trimmedPath := strings.TrimPrefix(c.Request.URL.Path, staticPathPrefix)
 	matches := forecastPathRegexp.FindStringSubmatch(trimmedPath)
 	if len(matches) != 4 {
@@ -132,7 +132,7 @@ func tryPreviousDaysForecast(c *gin.Context) error {
 	}
 
 	// Construct new URL and redirect
-	newURL := fmt.Sprintf("%s%s/%s/%02d.png", staticPathPrefix, overlay, prevDay, prevHour)
+	newURL := fmt.Sprintf("%s%s/%s/%02d.webp", staticPathPrefix, overlay, prevDay, prevHour)
 	c.Redirect(http.StatusTemporaryRedirect, newURL)
 	return nil
 }
