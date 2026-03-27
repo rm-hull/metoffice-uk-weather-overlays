@@ -16,7 +16,7 @@ type ReplaceColorStage struct {
 // Process replaces pixels close to the specified color with transparency based on the distance to that color
 // Tolerance defines how close a pixel must be to the target color to be affected
 // A pixel exactly matching the target color becomes fully transparent, one at the edge of the tolerance remains opaque
-func (s *ReplaceColorStage) Process(p *imageprocessing.PngImage) error {
+func (s *ReplaceColorStage) Process(p *imageprocessing.ProcessedImage) error {
 	bounds := p.Img.Bounds()
 	out := image.NewNRGBA(bounds)
 	replaceR, replaceG, replaceB, _ := s.Replace.RGBA()
