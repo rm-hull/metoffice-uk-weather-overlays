@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 
-	imageprocessing "github.com/rm-hull/metoffice-uk-weather-overlays/internal/image_processing"
+	imageprocessing "github.com/rm-hull/metoffice-uk-weather-overlays/internal/imageprocessing"
 )
 
 func CreateAnimation() {
