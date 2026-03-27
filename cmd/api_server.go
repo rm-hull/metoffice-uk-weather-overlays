@@ -1,9 +1,11 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"regexp"
 	"strconv"
 	"strings"
@@ -13,6 +15,7 @@ import (
 	"github.com/gin-contrib/pprof"
 	"github.com/gin-gonic/gin"
 	"github.com/rm-hull/godx"
+	"github.com/rm-hull/metoffice-uk-weather-overlays/internal"
 	healthcheck "github.com/tavsec/gin-healthcheck"
 	"github.com/tavsec/gin-healthcheck/checks"
 	hc_config "github.com/tavsec/gin-healthcheck/config"
@@ -20,14 +23,29 @@ import (
 
 const staticPathPrefix = "/v1/metoffice/datahub/"
 
-var forecastPathRegexp = regexp.MustCompile(`^([^/]+)/(\d{4}/\d{2}/\d{2})/(\d{2})\.png$`)
+var forecastPathRegexp = regexp.MustCompile(`^([^/]+)/(\d{4}/\d{2}/\d{2})/(\d{2})\.webp$`)
 
 // ApiServer starts an HTTP server to serve static files from rootDir on the given port.
 // If debug is true, pprof endpoints are enabled.
-func ApiServer(rootDir string, port int, debug bool) {
+func ApiServer(rootDir string, port int, debug bool) error {
 	godx.GitVersion()
 	godx.UserInfo()
 	godx.EnvironmentVars()
+
+	apiKey := os.Getenv("METOFFICE_DATAHUB_API_KEY")
+	if apiKey == "" {
+		return errors.New("environment variable METOFFICE_DATAHUB_API_KEY not set")
+	}
+
+	orderId := os.Getenv("METOFFICE_ORDER_ID")
+	if orderId == "" {
+		return errors.New("environment variable METOFFICE_ORDER_ID not set")
+	}
+
+	_, err := internal.StartCron(rootDir, apiKey, orderId)
+	if err != nil {
+		return err
+	}
 
 	r := gin.New()
 
@@ -48,9 +66,9 @@ func ApiServer(rootDir string, port int, debug bool) {
 		pprof.Register(r)
 	}
 
-	err := healthcheck.New(r, hc_config.DefaultConfig(), []checks.Check{})
+	err = healthcheck.New(r, hc_config.DefaultConfig(), []checks.Check{})
 	if err != nil {
-		log.Fatalf("failed to initialize healthcheck: %v", err)
+		return fmt.Errorf("failed to initialize healthcheck: %v", err)
 	}
 
 	r.Static(staticPathPrefix, rootDir)
@@ -75,18 +93,19 @@ func ApiServer(rootDir string, port int, debug bool) {
 	addr := fmt.Sprintf(":%d", port)
 	log.Printf("Starting HTTP API Server on port %d...", port)
 	if err := r.Run(addr); err != nil && err != http.ErrServerClosed {
-		log.Fatalf("HTTP API Server failed to start on port %d: %v", port, err)
+		return fmt.Errorf("HTTP API Server failed to start on port %d: %v", port, err)
 	}
+	return nil
 }
 
 // tryPreviousDaysForecast attempts to handle requests for missing forecast files
 // by redirecting to the previous day's forecast at the same hour + 24.
-// For example, a request for /v1/metoffice/datahub/cloud_amount_total/2023/10/15/20.png
-// would be redirected to /v1/metoffice/datahub/cloud_amount_total/2023/10/14/44.png
+// For example, a request for /v1/metoffice/datahub/cloud_amount_total/2023/10/15/20.webp
+// would be redirected to /v1/metoffice/datahub/cloud_amount_total/2023/10/14/44.webp
 // if the original file is not found.
 func tryPreviousDaysForecast(c *gin.Context) error {
 	// Use regex to extract overlay, year, month, day, hour
-	// Example path: /v1/metoffice/datahub/cloud_amount_total/2023/10/15/20.png
+	// Example path: /v1/metoffice/datahub/cloud_amount_total/2023/10/15/20.webp
 	trimmedPath := strings.TrimPrefix(c.Request.URL.Path, staticPathPrefix)
 	matches := forecastPathRegexp.FindStringSubmatch(trimmedPath)
 	if len(matches) != 4 {
@@ -113,7 +132,7 @@ func tryPreviousDaysForecast(c *gin.Context) error {
 	}
 
 	// Construct new URL and redirect
-	newURL := fmt.Sprintf("%s%s/%s/%02d.png", staticPathPrefix, overlay, prevDay, prevHour)
+	newURL := fmt.Sprintf("%s%s/%s/%02d.webp", staticPathPrefix, overlay, prevDay, prevHour)
 	c.Redirect(http.StatusTemporaryRedirect, newURL)
 	return nil
 }
