@@ -67,6 +67,7 @@ func cleanupOldOverflowForecasts(rootDir string) {
 
 	err := filepath.WalkDir(rootDir, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
+			log.Printf("cleanup: error accessing %q: %v", path, err)
 			return nil
 		}
 		if d.IsDir() {
@@ -75,6 +76,7 @@ func cleanupOldOverflowForecasts(rootDir string) {
 
 		rel, err := filepath.Rel(rootDir, path)
 		if err != nil {
+			log.Printf("cleanup: could not get relative path for %q: %v", path, err)
 			return nil
 		}
 
@@ -89,6 +91,7 @@ func cleanupOldOverflowForecasts(rootDir string) {
 
 		forecastDate, err := time.ParseInLocation("2006/01/02", dateStr, now.Location())
 		if err != nil {
+			log.Printf("cleanup: could not parse date from path %q: %v", path, err)
 			return nil
 		}
 
@@ -98,6 +101,7 @@ func cleanupOldOverflowForecasts(rootDir string) {
 
 		hour, err := strconv.Atoi(hourStr)
 		if err != nil {
+			log.Printf("cleanup: could not parse hour from path %q: %v", path, err)
 			return nil
 		}
 
