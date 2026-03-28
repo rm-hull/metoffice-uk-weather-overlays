@@ -63,7 +63,7 @@ func ScheduleCleanupJob(c *cron.Cron, rootDir string) error {
 
 func cleanupOldOverflowForecasts(rootDir string) {
 	now := time.Now()
-	cutoff := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location()).Add(-7 * 24 * time.Hour)
+	cutoff := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, now.Location()).AddDate(0, 0, -7)
 
 	err := filepath.WalkDir(rootDir, func(path string, d fs.DirEntry, err error) error {
 		if err != nil {
