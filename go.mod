@@ -3,7 +3,7 @@ module github.com/rm-hull/metoffice-uk-weather-overlays
 go 1.26
 
 require (
-	github.com/anthonynsimon/bild v0.14.0
+	github.com/anthonynsimon/bild v0.15.0
 	github.com/gin-gonic/gin v1.12.0
 	github.com/joho/godotenv v1.5.1
 	github.com/kettek/apng v0.0.0-20250827064933-2bb5f5fcf253
