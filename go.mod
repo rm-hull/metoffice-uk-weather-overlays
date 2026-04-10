@@ -75,7 +75,7 @@ require (
 	github.com/rm-hull/godx v0.2.1
 	github.com/robfig/cron/v3 v3.0.1
 	github.com/spf13/cobra v1.10.2
-	github.com/tavsec/gin-healthcheck v1.7.14
+	github.com/tavsec/gin-healthcheck v1.7.15
 	github.com/twitchyliquid64/golang-asm v0.15.1 // indirect
 	github.com/ugorji/go/codec v1.3.1 // indirect
 	golang.org/x/arch v0.25.0 // indirect
