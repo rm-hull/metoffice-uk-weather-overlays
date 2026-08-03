@@ -3,7 +3,7 @@ module github.com/map-services/metoffice-uk-weather-overlays
 go 1.26
 
 require (
-	github.com/anthonynsimon/bild v0.16.1
+	github.com/anthonynsimon/bild v0.17.0
 	github.com/gin-gonic/gin v1.12.0
 	github.com/joho/godotenv v1.5.1
 	github.com/kettek/apng v0.0.0-20250827064933-2bb5f5fcf253
@@ -52,7 +52,7 @@ require (
 	github.com/Depado/ginprom v1.8.3
 	github.com/bytedance/gopkg v0.1.4 // indirect
 	github.com/bytedance/sonic v1.15.2 // indirect
-	github.com/bytedance/sonic/loader v0.5.1 // indirect
+	github.com/bytedance/sonic/loader v0.5.2 // indirect
 	github.com/chai2010/webp v1.4.0
 	github.com/cloudwego/base64x v0.1.7 // indirect
 	github.com/earthboundkid/versioninfo/v2 v2.24.1 // indirect
