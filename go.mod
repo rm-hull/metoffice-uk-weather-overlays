@@ -1,6 +1,6 @@
 module github.com/map-services/metoffice-uk-weather-overlays
 
-go 1.26
+go 1.27
 
 require (
 	github.com/anthonynsimon/bild v0.17.0
